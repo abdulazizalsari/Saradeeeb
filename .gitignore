@@ -1,0 +1,11 @@
+# Machine- and environment-specific credentials
+/config/local.php
+/.env
+/.env.*
+!/.env.example
+
+# Runtime data: keep outside source control and include in backups.
+/storage/*.log
+/storage/*.sql
+/storage/backups/
+/uploads/
