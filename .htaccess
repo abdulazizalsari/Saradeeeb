@@ -4,14 +4,17 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+# Force HTTPS outside explicitly local development hosts.
 RewriteCond %{HTTP_HOST} !^(?:localhost|127\.0\.0\.1|\[::1\])(?::[0-9]+)?$ [NC]
 RewriteCond %{HTTP_HOST} !\.test(?::[0-9]+)?$ [NC]
 RewriteCond %{HTTPS} !=on
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Block internal application directories from direct web access
 RewriteRule ^(?:app|config|database|storage|cron|tools|tests)(?:/|$) - [F,L,NC]
 
+# Keep real files/folders accessible (assets, uploads, install.php)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
@@ -27,6 +30,8 @@ Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 Header always set Cross-Origin-Opener-Policy "same-origin"
 Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
 
+# Fingerprinted/versioned static assets can be cached by browsers and CDNs.
+# Dynamic PHP responses, feeds and sitemaps intentionally do not receive this policy.
 <FilesMatch "\.(?:css|js|mjs|woff2?|ttf|otf|png|jpe?g|gif|webp|avif|svg|ico)$">
 Header set Cache-Control "public, max-age=31536000, immutable"
 </FilesMatch>

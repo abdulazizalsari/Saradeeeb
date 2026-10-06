@@ -3,6 +3,9 @@
 /.env
 /.env.*
 !/.env.example
+/admin-filament/.env
+/admin-filament/.env.*
+!/admin-filament/.env.example
 
 # Runtime data: keep outside source control and include in backups.
 /storage/*.log

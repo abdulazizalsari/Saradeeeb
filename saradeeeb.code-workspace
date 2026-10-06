@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {"path": "."}
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.DS_Store": true
+    },
+    "editor.formatOnSave": false,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "search.exclude": {
+      "uploads/**": true,
+      "storage/**": true
+    }
+  }
+}
