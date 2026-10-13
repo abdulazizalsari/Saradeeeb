@@ -4,6 +4,7 @@ return [
     'tagline' => 'ما وراء الظلام… أعظم مما تتخيل',
     'base_url' => '',
     'default_locale' => 'ar',
+    // Launch languages for Saradeeeb.
     'locales' => [
         'ar' => ['name' => 'العربية', 'dir' => 'rtl', 'locale' => 'ar', 'flag' => 'sy'],
         'en' => ['name' => 'English', 'dir' => 'ltr', 'locale' => 'en', 'flag' => 'gb'],
