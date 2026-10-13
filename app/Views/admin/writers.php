@@ -1,0 +1,13 @@
+<section class="page-head"><div><span class="panel-kicker">مركز مستقل</span><h1>حسابات الكتّاب</h1><p>إدارة الحسابات، صلاحيات الكاتب، النشر، الملف المهني والدخول للدعم من مكان واحد.</p></div><div class="actions"><a class="btn btn-ghost" href="/admin/writer-applications">طلبات الانضمام</a><a class="btn btn-ghost" href="/admin/users">كل الحسابات</a></div></section>
+<section class="writer-control-stats"><article><b><?=number_format($stats['total'])?></b><span>إجمالي الكتّاب</span></article><article><b><?=number_format($stats['active'])?></b><span>حسابات مفعّلة</span></article><article><b><?=number_format($stats['pending'])?></b><span>بانتظار التفعيل</span></article><article><b><?=number_format($stats['blocked'])?></b><span>حسابات محظورة</span></article></section>
+<section class="panel"><form method="get" class="writer-control-filter"><label>بحث عن كاتب<input name="q" value="<?=e($q)?>" placeholder="الاسم، @المستخدم أو البريد"></label><label>الحالة<select name="status"><option value="">كل الحالات</option><?php foreach(['active'=>'مفعّل','pending'=>'معلّق','blocked'=>'محظور'] as $key=>$label):?><option value="<?=$key?>" <?=$status===$key?'selected':''?>><?=$label?></option><?php endforeach;?></select></label><button class="btn btn-primary">بحث</button></form></section>
+<section class="writer-control-grid">
+<?php foreach($writers as $writer): $public=writer_url((string)$writer['username'],default_locale()); ?>
+ <article class="writer-control-card">
+  <div class="writer-control-top"><div class="writer-control-avatar"><?php if(!empty($writer['avatar'])):?><img src="<?=e($writer['avatar'])?>" alt=""><?php else:?><span><?=e(mb_substr((string)$writer['name'],0,1,'UTF-8'))?></span><?php endif;?></div><div><h2><?=e($writer['name'])?> <?=writer_badges_html($writer)?></h2><p>@<?=e($writer['username'])?> · <?=e($writer['professional_title']?:'كاتب في سراديب')?></p><span class="status s-<?=e($writer['status'])?>"><?=e($writer['status']==='active'?'مفعّل':($writer['status']==='pending'?'معلّق':'محظور'))?></span></div></div>
+  <div class="writer-control-metrics"><span><b><?=number_format((int)$writer['published'])?></b> منشور</span><span><b><?=number_format((int)$writer['articles'])?></b> مقال</span><span><b><?=number_format((int)$writer['views'])?></b> مشاهدة</span></div>
+  <div class="writer-control-actions"><a class="btn btn-primary" href="/admin/writers/<?=$writer['id']?>">التحكم الكامل</a><a class="btn btn-ghost" target="_blank" href="<?=e($public)?>">الملف العام</a></div>
+ </article>
+<?php endforeach;?>
+<?php if(!$writers):?><div class="empty-state"><h2>لا توجد نتائج</h2><p>جرّب تغيير عبارة البحث أو حالة الحساب.</p></div><?php endif;?>
+</section>

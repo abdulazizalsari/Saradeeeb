@@ -1,0 +1,5 @@
+<section class="admin-v2-page-intro"><div><span class="admin-v2-eyebrow">ADMINISTRATION MODULES</span><h2>وحدات الإدارة</h2><p>مركز موحّد للوحدات التي تعتمد على بيانات المشروع الحالية. كل زر يفتح شاشة تنفيذ حقيقية، وليس صفحة تجريبية.</p></div></section>
+<section class="admin-v2-module-grid" aria-label="وحدات الإدارة">
+<?php foreach($modules as $key=>$item): ?><a class="admin-v2-module-card" href="/admin-v2/modules/<?=e($key)?>"><span class="admin-v2-module-icon" aria-hidden="true"><?=e($item['icon'])?></span><div><h3><?=e($item['label'])?></h3><p><?=e($item['description'])?></p><strong><?= $counts[$key]===null?'غير متاح':number_format((int)$counts[$key]) ?> <small><?= $key==='translations'?'لغات مفعلة':'سجل قابل للإدارة' ?></small></strong></div><span class="admin-v2-module-arrow">←</span></a><?php endforeach; ?>
+</section>
+<section class="admin-v2-panel admin-v2-module-note"><h3>تنبيه صلاحيات</h3><p>تستخدم هذه الوحدات مسارات الإدارة الحالية مع حماية الحساب والصلاحيات وسجل الإجراءات. لا يتم تغيير السجلات من هذه الصفحة مباشرة.</p></section>

@@ -1,0 +1,32 @@
+/* Shared by the studio preview and the isolated A4 print document. */
+.writer-pdf-pages.professional-pdf{display:block;width:100%!important;max-width:794px;margin-inline:auto;direction:rtl;color:#172d30;background:#fff;border:1px solid #d8e4e5;border-radius:4px;box-shadow:0 12px 32px #073f4214;font-family:"IBM Plex Sans Arabic",Tahoma,Arial,sans-serif;box-sizing:border-box}
+.professional-pdf[hidden],.professional-pdf [hidden]{display:none!important}
+.professional-pdf .professional-document{padding:44px;min-height:900px;box-sizing:border-box;overflow-wrap:anywhere;line-height:1.85;font-size:14px}
+.professional-pdf .professional-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-bottom:22px;border-bottom:3px solid #127d82}
+.professional-pdf .professional-name{min-width:0}
+.professional-pdf .professional-kicker{font-size:12px;color:#536b6e;margin:0 0 8px}
+.professional-pdf h1{color:#172d30;font-size:32px;line-height:1.45;margin:0;letter-spacing:0}
+.professional-pdf .professional-title{margin:7px 0 0;color:#127d82;font-size:17px;font-weight:600}
+.professional-pdf .professional-photo{width:92px;height:112px;flex:0 0 92px;object-fit:cover;border-radius:4px;border:1px solid #d8e4e5}
+.professional-pdf .professional-contact{display:flex;flex-wrap:wrap;gap:6px 20px;padding:15px 0;font-style:normal;font-size:12px;border-bottom:1px solid #d8e4e5}
+.professional-pdf a{color:#0b666a;text-decoration:none;direction:ltr;unicode-bidi:embed;overflow-wrap:anywhere}
+.professional-pdf .professional-section{margin-top:24px}
+.professional-pdf h2{font-size:18px;line-height:1.6;color:#073f42;margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid #d8e4e5;break-after:avoid}
+.professional-pdf p{color:#344d50;margin:0 0 10px;orphans:3;widows:3}
+.professional-pdf ul,.professional-pdf ol{padding-inline-start:22px;margin:0}
+.professional-pdf li{margin-bottom:9px;color:#344d50;orphans:3;widows:3}
+.professional-pdf strong{color:#172d30;font-weight:600}
+.professional-pdf .professional-works span{display:block;color:#536b6e;font-size:12px}
+@media screen and (max-width:560px){.professional-pdf .professional-document{padding:22px;min-height:0;font-size:13px}.professional-pdf h1{font-size:25px}.professional-pdf .professional-heading{gap:14px}.professional-pdf .professional-photo{width:64px;height:80px;flex-basis:64px}.professional-pdf .professional-title{font-size:14px}}
+@page{size:A4;margin:18mm 17mm}
+@media print{
+  html,body{margin:0;padding:0;background:#fff;color:#172d30}
+  .writer-pdf-pages.professional-pdf{max-width:none;width:100%!important;border:0;border-radius:0;box-shadow:none;font-size:11pt}
+  .professional-pdf .professional-document{padding:0;min-height:0;font-size:11pt;line-height:1.8}
+  .professional-pdf .professional-heading{break-inside:avoid}
+  .professional-pdf h1{font-size:25pt}
+  .professional-pdf h2{font-size:14pt;break-after:avoid}
+  .professional-pdf .professional-contact{break-inside:avoid}
+  .professional-pdf .professional-section{margin-top:6mm}
+  .professional-pdf .professional-works li{break-inside:avoid}
+}
