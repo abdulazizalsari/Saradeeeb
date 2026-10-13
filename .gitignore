@@ -3,12 +3,23 @@
 /.env
 /.env.*
 !/.env.example
-/admin-filament/.env
-/admin-filament/.env.*
-!/admin-filament/.env.example
 
 # Runtime data: keep outside source control and include in backups.
 /storage/*.log
 /storage/*.sql
 /storage/backups/
+/storage/dev-mysql/
+/storage/dev-php.ini
+/storage/dev-setup.php
+/storage/dev-access.txt
 /uploads/
+
+# Runtime and private data (public GitHub safety)
+/storage/
+/uploads/
+/.continue/
+*.rar
+*.sql.gz
+*.pem
+*.p12
+*.pfx
