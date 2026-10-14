@@ -17,16 +17,17 @@ spl_autoload_register(function (string $class): void {
 $appConfig = require BASE_PATH . '/config/app.php';
 $localPath = BASE_PATH . '/config/local.php';
 
-if (!is_file($localPath) && !str_contains($_SERVER['SCRIPT_NAME'] ?? '', 'install.php')) {
+$environment = static function (string $name): string|false {
+    $value = getenv($name);
+    return ($value === false || $value === '') ? false : $value;
+};
+$hasDatabaseEnvironment = $environment('DB_HOST') !== false && $environment('DB_DATABASE') !== false;
+if (!is_file($localPath) && !$hasDatabaseEnvironment && !str_contains($_SERVER['SCRIPT_NAME'] ?? '', 'install.php')) {
     header('Location: /install.php');
     exit;
 }
 
 $localConfig = is_file($localPath) ? require $localPath : [];
-$environment = static function (string $name): string|false {
-    $value = getenv($name);
-    return ($value === false || $value === '') ? false : $value;
-};
 
 // Environment values take precedence in Staging/Production. local.php remains
 // a compatible local-development fallback and is never committed.
@@ -51,6 +52,12 @@ $isLocalRequest = PHP_SAPI === 'cli' || preg_match('/^(?:localhost|127\.0\.0\.1|
 $migrationSetting = $environment('APP_RUN_MIGRATIONS');
 $runSchemaMigrations = $migrationSetting === false ? $isLocalRequest : filter_var($migrationSetting, FILTER_VALIDATE_BOOL);
 
+// Vercel provides DB_* values as encrypted environment variables. Initialize
+// the external database before starting an optional database-backed session.
+if (!empty($GLOBALS['db_config'])) {
+    Database::init($GLOBALS['db_config']);
+}
+
 if (PHP_SAPI !== 'cli') {
     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
     // The __Host- cookie prefix is valid only on HTTPS. Browsers reject it on
@@ -67,13 +74,17 @@ if (PHP_SAPI !== 'cli') {
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
+    if (strtolower((string)$environment('APP_SESSION_DRIVER')) === 'database' && !empty($GLOBALS['db_config'])) {
+        $lifetime = max(60, (int)ini_get('session.gc_maxlifetime'));
+        session_set_save_handler(new \App\Core\DatabaseSessionHandler($lifetime), true);
+        ini_set('session.use_strict_mode', '1');
+    }
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 }
 
 require BASE_PATH . '/app/helpers.php';
 
 if (!empty($GLOBALS['db_config'])) {
-    Database::init($GLOBALS['db_config']);
     if ($runSchemaMigrations && !str_contains((string)($_SERVER['SCRIPT_NAME'] ?? ''), 'install.php')) {
         require_once BASE_PATH . '/app/migrations.php';
         run_schema_migrations();

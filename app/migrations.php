@@ -30,6 +30,15 @@ function schema_put_setting_default(string $key,string $value): void {
 
 function run_schema_migrations(): void {
     if(!schema_table_exists('settings')) return;
+    // Stateless hosts such as Vercel require shared session storage. This table
+    // is additive and is used only when APP_SESSION_DRIVER=database is enabled.
+    Database::exec("CREATE TABLE IF NOT EXISTS app_sessions (
+        id VARCHAR(128) PRIMARY KEY,
+        payload MEDIUMBLOB NOT NULL,
+        expires_at DATETIME NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_app_sessions_expiry(expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     // Google identities are additive and separate from password credentials.
     // The table is safe to create on every request and never stores secrets.
     try {
