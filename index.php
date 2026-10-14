@@ -28,6 +28,7 @@ use App\Controllers\AdminV2RolesController;
 use App\Controllers\AdminV2TeamController;
 use App\Controllers\AdminV2SettingsController;
 use App\Controllers\AdminV2ModulesController;
+use App\Controllers\CronController;
 
 $router = new Router();
 $defaultLocale = default_locale();
@@ -39,6 +40,7 @@ $router->get('/robots.txt', [PublicController::class, 'robots']);
 $router->get('/llms.txt', [PublicController::class, 'llms']);
 $router->get('/llms-full.txt', [PublicController::class, 'llmsFull']);
 $router->get('/feed.xml', [PublicController::class, 'feed']);
+$router->get('/internal/cron/publish-scheduled', [CronController::class, 'publishScheduled']);
 
 $router->post('/logout', [AuthController::class, 'logout']);
 $router->get('/auth/google/start', fn() => (new AuthController())->googleStart((string)($_GET['locale']??$defaultLocale)));

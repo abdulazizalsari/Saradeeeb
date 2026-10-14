@@ -246,7 +246,11 @@ final class AdminToolsController {
     public function deleteStorySubmission(): void {
         $this->admin(); Csrf::enforce(); $id=(int)($_POST['id']??0);
         $row=Database::one('SELECT image FROM story_submissions WHERE id=?',[$id]);
-        if($row && !empty($row['image'])){ $path=BASE_PATH.(string)$row['image']; if(is_file($path) && str_starts_with(realpath($path)?:'',realpath(BASE_PATH.'/uploads')?:'!')) @unlink($path); }
+        if($row && !empty($row['image'])){
+            $image=(string)$row['image'];
+            if(\App\Core\ObjectStorage::enabled()) \App\Core\ObjectStorage::delete($image);
+            else { $path=BASE_PATH.$image; if(is_file($path) && str_starts_with(realpath($path)?:'',realpath(BASE_PATH.'/uploads')?:'!')) @unlink($path); }
+        }
         Database::exec('DELETE FROM story_submissions WHERE id=?',[$id]); audit_log('story_submission_delete','story_submission',$id,''); redirect('/admin/story-submissions');
     }
     public function newsletter(): void {

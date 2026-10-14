@@ -10,5 +10,8 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/api/index.php" }
+  ],
+  "crons": [
+    { "path": "/internal/cron/publish-scheduled", "schedule": "0 * * * *" }
   ]
 }

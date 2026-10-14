@@ -38,10 +38,10 @@ final class EditorialMessagesController {
             if(in_array($mime,['image/jpeg','image/png','image/webp','image/avif','image/gif'],true)){
                 $saved=Upload::imageDetailed($file,true); if(!$saved) continue; $path=(string)$saved['path'];$mime=(string)$saved['mime'];$size=(int)$saved['size_bytes'];
             } elseif($mime==='application/pdf') {
-                if(setting('security_upload_validation','1')==='1' && PHP_SAPI!=='cli' && !is_uploaded_file((string)$file['tmp_name'])) throw new \RuntimeException('تعذر التحقق من المرفق.');
-                $dir=BASE_PATH.'/uploads/editorial/'.date('Y/m'); if(!is_dir($dir)&&!mkdir($dir,0755,true)&&!is_dir($dir))throw new \RuntimeException('تعذر إنشاء مجلد المرفقات.');
-                $name=bin2hex(random_bytes(16)).'.pdf';$dest=$dir.'/'.$name;if(!move_uploaded_file((string)$file['tmp_name'],$dest))throw new \RuntimeException('تعذر حفظ ملف PDF.');
-                $path='/uploads/editorial/'.date('Y/m').'/'.$name;$size=(int)(@filesize($dest)?:0);
+                // Reuse the central uploader so PDF attachments are durable on
+                // serverless deployments and retain the same validation rules.
+                $saved=Upload::fileDetailed($file); if(!$saved || ($saved['mime']??'')!=='application/pdf') throw new \RuntimeException('تعذر حفظ ملف PDF.');
+                $path=(string)$saved['path'];$size=(int)$saved['size_bytes'];
             } else throw new \RuntimeException('المرفقات المسموحة: الصور وPDF فقط.');
             Database::insert('INSERT INTO editorial_message_attachments(message_id,path,original_name,mime_type,size_bytes) VALUES(?,?,?,?,?)',[$messageId,$path,mb_substr((string)($file['name']??'file'),0,240),$mime,$size]);
         }

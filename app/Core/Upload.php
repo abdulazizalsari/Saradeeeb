@@ -18,8 +18,8 @@ final class Upload {
         $size=@getimagesize($file['tmp_name']); if($size===false) throw new \RuntimeException('ملف الصورة غير صالح.');
         [$width,$height]=$size;
         if($strictValidation && ($width<1 || $height<1 || $width>12000 || $height>12000 || ($width*$height)>60000000)) throw new \RuntimeException('أبعاد الصورة غير آمنة أو أكبر من الحد المسموح.');
-        $dir=BASE_PATH.'/uploads/'.date('Y/m'); if(!is_dir($dir) && !mkdir($dir,0755,true) && !is_dir($dir)) throw new \RuntimeException('تعذر إنشاء مجلد الصور.');
-        $base=bin2hex(random_bytes(16)); $ext=$allowed[$mime]; $outMime=$mime; $dest=$dir.'/'.$base.'.'.$ext;
+        $dir=BASE_PATH.'/uploads/'.date('Y/m'); if(!ObjectStorage::enabled() && !is_dir($dir) && !mkdir($dir,0755,true) && !is_dir($dir)) throw new \RuntimeException('تعذر إنشاء مجلد الصور.');
+        $base=bin2hex(random_bytes(16)); $ext=$allowed[$mime]; $outMime=$mime; $dest=(ObjectStorage::enabled()?rtrim(sys_get_temp_dir(),DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR:$dir.'/'.$base.'.').(ObjectStorage::enabled()?$base.'.'.$ext:$ext);
         $converted=false;
         if($preferWebp && $mime!=='image/webp' && $mime!=='image/gif' && function_exists('imagewebp')){
             $img=match($mime){
@@ -29,10 +29,16 @@ final class Upload {
             };
             if($img){
                 if($mime==='image/png'){ imagepalettetotruecolor($img); imagealphablending($img,true); imagesavealpha($img,true); }
-                $dest=$dir.'/'.$base.'.webp';
+                $dest=ObjectStorage::enabled()?rtrim(sys_get_temp_dir(),DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$base.'.webp':$dir.'/'.$base.'.webp';
                 if(@imagewebp($img,$dest,84)){ $ext='webp'; $outMime='image/webp'; $converted=true; }
                 imagedestroy($img);
             }
+        }
+        if(ObjectStorage::enabled()) {
+            $temporary = $converted ? $dest : (string)$file['tmp_name'];
+            $key='uploads/'.date('Y/m').'/'.$base.'.'.$ext;
+            try { $path=ObjectStorage::put($temporary,$key,$outMime); } finally { if($converted && is_file($dest)) @unlink($dest); }
+            return ['path'=>$path,'mime'=>$outMime,'width'=>(int)$width,'height'=>(int)$height,'size_bytes'=>(int)($file['size']??0),'original_name'=>substr((string)($file['name']??''),0,240),'kind'=>'image'];
         }
         if(!$converted && !move_uploaded_file($file['tmp_name'],$dest)) throw new \RuntimeException('تعذر حفظ الصورة.');
         $relative='/uploads/'.date('Y/m').'/'.basename($dest);
@@ -81,8 +87,12 @@ final class Upload {
         if((int)($file['size']??0)>$max) throw new \RuntimeException('حجم الملف يجب ألا يتجاوز 25MB.');
         $kind=$rules[$originalExt]['kind'];
         $dir=BASE_PATH.'/uploads/files/'.date('Y/m');
-        if(!is_dir($dir) && !mkdir($dir,0755,true) && !is_dir($dir)) throw new \RuntimeException('تعذر إنشاء مجلد الملفات.');
-        $dest=$dir.'/'.bin2hex(random_bytes(16)).'.'.$originalExt;
+        if(!ObjectStorage::enabled() && !is_dir($dir) && !mkdir($dir,0755,true) && !is_dir($dir)) throw new \RuntimeException('تعذر إنشاء مجلد الملفات.');
+        $name=bin2hex(random_bytes(16)).'.'.$originalExt; $dest=$dir.'/'.$name;
+        if(ObjectStorage::enabled()) {
+            $path=ObjectStorage::put($tmp,'uploads/files/'.date('Y/m').'/'.$name,$mime);
+            return ['path'=>$path,'mime'=>$mime,'width'=>null,'height'=>null,'size_bytes'=>(int)($file['size']??0),'original_name'=>substr($original,0,240),'kind'=>$kind];
+        }
         if(!move_uploaded_file($tmp,$dest)) throw new \RuntimeException('تعذر حفظ الملف.');
         return [
             'path'=>'/uploads/files/'.date('Y/m').'/'.basename($dest),
