@@ -1,0 +1,6 @@
+<?php $canonical=locale_url($locale,'community/'.$category['slug']); $C=community_ui($locale); ?>
+<section class="community-page">
+  <div class="container community-category-hero"><a href="<?=e(locale_url($locale,'community'))?>">← <?=e($C['back'])?></a><span><?=e($C['section'])?></span><h1><?=e($category['name'])?></h1><p><?=e($category['description'])?></p></div>
+  <div class="container community-toolbar"><nav class="community-filters"><?php foreach(['latest'=>$C['latest'],'discussed'=>$C['discussed'],'unanswered'=>$C['unanswered'],'active'=>$C['active'],'views'=>$C['views_filter']] as $key=>$label):?><a class="<?=$filter===$key?'active':''?>" href="<?=e($canonical.'?filter='.$key)?>"><?=e($label)?></a><?php endforeach;?></nav><?php if($user):?><a class="btn btn-primary" href="<?=e(locale_url($locale,'community/new'))?>">+ <?=e($C['start'])?></a><?php endif;?></div>
+  <section class="container community-stream"><div class="community-topic-list"><?php if(!$rows):?><div class="community-empty"><strong><?=e($C['empty_section'])?></strong></div><?php else:foreach($rows as $topic)require __DIR__.'/_topic-card.php';endif;?></div><?=community_pagination($pagination,$canonical,['filter'=>$filter])?></section>
+</section>
