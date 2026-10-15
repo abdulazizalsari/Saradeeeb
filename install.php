@@ -3,6 +3,24 @@ declare(strict_types=1);
 $root=__DIR__; $lock=$root.'/storage/installed.lock';
 if(is_file($lock)){http_response_code(403);exit('تم تثبيت سراديب مسبقًا. احذف install.php بعد التأكد من عمل الموقع.');}
 $error='';$success=false;
+// Deployment preflight: do not install a partial source checkout.
+$requiredFiles=[
+    $root.'/app/Core/Router.php',
+    $root.'/app/Core/Database.php',
+    $root.'/app/Controllers/PublicController.php',
+    $root.'/database/schema.sql',
+];
+$missingFiles=array_values(array_filter($requiredFiles,static fn(string $file):bool=>!is_file($file)));
+if($missingFiles){
+    http_response_code(503);
+    exit('ملفات سراديب الأساسية غير مكتملة. استعد حزمة PHP الكاملة قبل التثبيت.');
+}
+$schemaText=(string)file_get_contents($root.'/database/schema.sql');
+if(str_contains($schemaText,'NOT the full application schema')){
+    http_response_code(503);
+    exit('مخطط قاعدة البيانات الحالي أولي وغير مكتمل. لا يمكن تشغيل التثبيت النهائي.');
+}
+
 if($_SERVER['REQUEST_METHOD']==='POST'){
     $host=trim($_POST['db_host']??'localhost');$db=trim($_POST['db_name']??'');$user=trim($_POST['db_user']??'');$pass=(string)($_POST['db_pass']??'');$base=rtrim(trim($_POST['base_url']??''),'/');$adminName=trim($_POST['admin_name']??'');$adminEmail=strtolower(trim($_POST['admin_email']??''));$adminPass=(string)($_POST['admin_pass']??'');
     if(!$db||!$user||!filter_var($adminEmail,FILTER_VALIDATE_EMAIL)||strlen($adminPass)<12||!filter_var($base,FILTER_VALIDATE_URL))$error='تحقق من البيانات. كلمة مرور المدير يجب أن تكون 12 محرفًا على الأقل.';
