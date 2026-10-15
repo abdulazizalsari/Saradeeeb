@@ -1,0 +1,27 @@
+-- Saradeeeb bootstrap schema (minimal installer tables only).
+-- IMPORTANT: This is NOT the full application schema.
+-- Use only with a new, empty database. Additional CMS tables are required.
+CREATE TABLE IF NOT EXISTS users (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(190) NOT NULL,
+ username VARCHAR(100) NOT NULL UNIQUE,
+ email VARCHAR(190) NOT NULL UNIQUE,
+ password_hash VARCHAR(255) NOT NULL,
+ role VARCHAR(50) NOT NULL DEFAULT 'writer',
+ status VARCHAR(50) NOT NULL DEFAULT 'pending',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS settings (
+ `key` VARCHAR(190) NOT NULL PRIMARY KEY,
+ value LONGTEXT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE IF NOT EXISTS languages (
+ id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ code VARCHAR(12) NOT NULL UNIQUE,
+ name VARCHAR(100) NOT NULL,
+ flag VARCHAR(30) NOT NULL DEFAULT '',
+ dir VARCHAR(3) NOT NULL DEFAULT 'ltr',
+ enabled TINYINT(1) NOT NULL DEFAULT 1,
+ is_default TINYINT(1) NOT NULL DEFAULT 0,
+ sort_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
