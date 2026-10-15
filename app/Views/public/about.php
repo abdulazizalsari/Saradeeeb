@@ -1,0 +1,35 @@
+<?php
+$dir=(article_locales()[$locale]['dir']??'ltr');
+$labels=[
+ 'ar'=>['identity'=>'هوية المنصة','writers'=>'منتدى الكتّاب','writing'=>'الكتابة في سراديب','offers'=>'ماذا تقدم سراديب للكتّاب؟','joining'=>'الانضمام إلى الكتّاب','review'=>'المراجعة والتحرير','vision'=>'الرؤية','mission'=>'الرسالة','goals'=>'الأهداف','specialties'=>'مجالات سراديب','types'=>'ما الذي ننشره؟','philosophy'=>'فلسفتنا التحريرية','join'=>'الانضمام إلى الكتّاب','story'=>'أرسل قصتك','contact'=>'تواصل','contact_title'=>'تواصل مع سراديب','contact_button'=>'اتصل بنا','socials'=>'روابط سراديب الرسمية','preview'=>'معاينة خاصة للمسودة — هذه النسخة غير منشورة للزوار.'],
+ 'en'=>['identity'=>'Platform identity','writers'=>'Writer community','writing'=>'Writing at Saradeeeb','offers'=>'What Saradeeeb offers writers','joining'=>'Joining the writers','review'=>'Editorial review','vision'=>'Vision','mission'=>'Mission','goals'=>'Goals','specialties'=>'Saradeeeb fields','types'=>'What we publish','philosophy'=>'Editorial philosophy','join'=>'Join the writers','story'=>'Send your story','contact'=>'Contact','contact_title'=>'Contact Saradeeeb','contact_button'=>'Contact us','socials'=>'Official Saradeeeb links','preview'=>'Private draft preview — visitors cannot see this version.'],
+ 'es'=>['identity'=>'Identidad de la plataforma','writers'=>'Comunidad de autores','writing'=>'Escribir en Saradeeeb','offers'=>'Lo que Saradeeeb ofrece a los autores','joining'=>'Unirse a los autores','review'=>'Revisión editorial','vision'=>'Visión','mission'=>'Misión','goals'=>'Objetivos','specialties'=>'Ámbitos de Saradeeeb','types'=>'Qué publicamos','philosophy'=>'Filosofía editorial','join'=>'Unirse a los autores','story'=>'Envía tu historia','contact'=>'Contacto','contact_title'=>'Contacta con Saradeeeb','contact_button'=>'Contáctanos','socials'=>'Enlaces oficiales de Saradeeeb','preview'=>'Vista privada del borrador; los visitantes no pueden ver esta versión.'],
+ 'fr'=>['identity'=>'Identité de la plateforme','writers'=>'Communauté des auteurs','writing'=>'Écrire sur Saradeeeb','offers'=>'Ce que Saradeeeb offre aux auteurs','joining'=>'Rejoindre les auteurs','review'=>'Révision éditoriale','vision'=>'Vision','mission'=>'Mission','goals'=>'Objectifs','specialties'=>'Domaines de Saradeeeb','types'=>'Ce que nous publions','philosophy'=>'Philosophie éditoriale','join'=>'Rejoindre les auteurs','story'=>'Envoyer votre histoire','contact'=>'Contact','contact_title'=>'Contacter Saradeeeb','contact_button'=>'Nous contacter','socials'=>'Liens officiels de Saradeeeb','preview'=>'Aperçu privé du brouillon — cette version est invisible aux visiteurs.'],
+ 'ru'=>['identity'=>'О платформе','writers'=>'Сообщество авторов','writing'=>'Публикации в Saradeeeb','offers'=>'Что Saradeeeb предлагает авторам','joining'=>'Как стать автором','review'=>'Редакционная проверка','vision'=>'Видение','mission'=>'Миссия','goals'=>'Цели','specialties'=>'Темы Saradeeeb','types'=>'Что мы публикуем','philosophy'=>'Редакционная философия','join'=>'Стать автором','story'=>'Отправить историю','contact'=>'Контакты','contact_title'=>'Связаться с Saradeeeb','contact_button'=>'Связаться с нами','socials'=>'Официальные ссылки Saradeeeb','preview'=>'Закрытый просмотр черновика — посетители не видят эту версию.'],
+]; $L=$labels[$locale]??$labels['en'];
+$rich=static fn(string $key): string => sanitize_page_html((string)($about[$key]??''));
+$has=static fn(string $key): bool => trim(strip_tags((string)($about[$key]??'')))!=='';
+$image=trim((string)($version['image_path']??''));
+$brandLogo=trim((string)setting('brand_logo',''));
+$sections=[
+ ['vision',$L['vision']],['mission',$L['mission']],['goals',$L['goals']],
+ ['specialties',$L['specialties']],['content_types',$L['types']],['editorial_philosophy',$L['philosophy']],
+];
+$writerSections=[['writer_offers',$L['offers']],['joining_info',$L['joining']],['review_info',$L['review']]];
+$contactUrl=locale_url($locale,'contact');
+$writerUrl=locale_url($locale,'writer-application');
+$storyUrl=locale_url($locale,'send-story');
+$socialLinks=site_social_links();
+$publicPageTitle=trim((string)($page['title']??'')) ?: (string)($about['platform_name']??'Saradeeeb');
+?>
+<main class="about-platform" dir="<?=e($dir)?>">
+<?php if(!empty($isPreview)):?><div class="about-preview-banner" role="status"><?=e($L['preview'])?></div><?php endif;?>
+<section class="about-platform-hero"><div class="container about-platform-hero-grid">
+ <div class="about-platform-copy"><span class="eyebrow">Saradeeeb</span><h1><?=e($publicPageTitle)?></h1><?php if($has('short_intro')):?><p class="about-platform-lead"><?=e($about['short_intro'])?></p><?php endif;?></div>
+ <?php if($image||$brandLogo):?><figure class="about-platform-visual"><img src="<?=e($image?:$brandLogo)?>" alt="<?=e((string)($version['image_alt']?:$publicPageTitle))?>"></figure><?php endif;?>
+</div></section>
+<?php if($has('full_intro')):?><section class="section about-platform-intro"><div class="container about-reading-width"><?=$rich('full_intro')?></div></section><?php endif;?>
+<?php $visible=array_values(array_filter($sections,static fn($section)=>$has($section[0]))); if($visible):?><section class="section about-platform-sections"><div class="container"><div class="about-section-heading"><span class="eyebrow">Saradeeeb</span><h2><?=e($L['identity'])?></h2></div><div class="about-platform-grid"><?php foreach($visible as [$key,$heading]):?><article><h3><?=e($heading)?></h3><div><?=$rich($key)?></div></article><?php endforeach;?></div></div></section><?php endif;?>
+<?php $visibleWriter=array_values(array_filter($writerSections,static fn($section)=>$has($section[0]))); if($visibleWriter):?><section class="section about-writers"><div class="container"><div class="about-section-heading"><span class="eyebrow"><?=e($L['writers'])?></span><h2><?=e($L['writing'])?></h2></div><div class="about-platform-grid about-writer-grid"><?php foreach($visibleWriter as [$key,$heading]):?><article><h3><?=e($heading)?></h3><div><?=$rich($key)?></div></article><?php endforeach;?></div><div class="about-platform-actions"><a class="btn btn-primary" href="<?=e($writerUrl)?>"><?=e($L['join'])?></a><a class="btn btn-ghost" href="<?=e($storyUrl)?>"><?=e($L['story'])?></a></div></div></section><?php endif;?>
+<?php if($has('contact_info')||$socialLinks):?><section class="section about-contact"><div class="container about-contact-card"><div><span class="eyebrow"><?=e($L['contact'])?></span><h2><?=e($L['contact_title'])?></h2><?php if($has('contact_info')):?><div><?=$rich('contact_info')?></div><?php endif;?></div><div class="about-contact-actions"><a class="btn btn-primary" href="<?=e($contactUrl)?>"><?=e($L['contact_button'])?></a><?php if($socialLinks):?><div class="about-socials" aria-label="<?=e($L['socials'])?>"><?php foreach($socialLinks as $social):?><a href="<?=e($social['url'])?>" target="_blank" rel="noopener noreferrer" aria-label="<?=e($social['label'])?>"><?=navigation_icon_svg($social['key'])?></a><?php endforeach;?></div><?php endif;?></div></div></section><?php endif;?>
+</main>

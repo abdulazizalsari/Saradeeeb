@@ -1,1 +1,0 @@
-import type { ReactNode } from "react"; import "./globals.css"; export const metadata={title:"سراديب",description:"قصص، غموض ومعرفة تتجاوز المألوف."}; export default function RootLayout({children}:{children:ReactNode}){return <html lang="ar" dir="rtl"><body>{children}</body></html>}
