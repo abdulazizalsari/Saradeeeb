@@ -1,5 +1,5 @@
-const CACHE = 'saradeeeb-admin-v3';
-const SHELL = ['/assets/css/app.css', '/assets/js/app.js'];
+const CACHE = 'saradeeeb-admin-v9';
+const SHELL = ['/assets/css/app.css?v=722', '/assets/js/app.js?v=675'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
