@@ -18,6 +18,26 @@ function installer_h(string $value): string
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/**
+ * The base schema deliberately contains the stable core tables.  The
+ * application migrations add newer, non-destructive modules.  Keep this list
+ * here so an installer can never report success after only importing a
+ * bootstrap subset of the database.
+ *
+ * @return list<string>
+ */
+function installer_required_tables(): array
+{
+    return [
+        'users', 'settings', 'languages', 'articles', 'article_translations',
+        'pages', 'page_translations', 'media', 'writer_profiles',
+        'writer_applications', 'notifications', 'audit_logs', 'auth_throttles',
+        'community_topics', 'community_replies', 'editorial_threads',
+        'editorial_messages', 'podcast_episodes', 'khawatir', 'books',
+        'card_templates', 'translation_imports', 'media_folders',
+    ];
+}
+
 // Either marker means this app has already been configured. Do not offer a form
 // that might encourage someone to point the installer at the existing database.
 if (is_file($installedLock) || is_file($localConfig)) {
@@ -71,6 +91,23 @@ if (!$blocked && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                     throw new InvalidArgumentException('تحقق من المدخلات. كلمة مرور المدير يجب أن تكون 12 محرفًا على الأقل، واسم قاعدة البيانات ومستخدمها أحرفًا وأرقامًا وشرطة سفلية فقط.');
                 }
 
+                $requiredFiles = [
+                    $root . '/app/bootstrap.php',
+                    $root . '/app/helpers.php',
+                    $root . '/app/Core/Router.php',
+                    $root . '/app/Core/Database.php',
+                    $root . '/app/Core/Auth.php',
+                    $root . '/app/Core/View.php',
+                    $root . '/app/Controllers/PublicController.php',
+                    $root . '/app/Controllers/AuthController.php',
+                    $root . '/app/Controllers/AdminController.php',
+                    $root . '/app/migrations.php',
+                ];
+                $missingFiles = array_filter($requiredFiles, static fn(string $file): bool => !is_file($file));
+                if ($missingFiles !== []) {
+                    throw new RuntimeException('ملفات التطبيق الأساسية غير مكتملة؛ استعد نسخة PHP الكاملة قبل التثبيت.');
+                }
+
                 $schemaPath = $root . '/database/schema.sql';
                 if (!is_file($schemaPath) || !is_readable($schemaPath)) {
                     throw new RuntimeException('ملف database/schema.sql غير موجود أو غير قابل للقراءة.');
@@ -103,6 +140,31 @@ if (!$blocked && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 );
                 foreach ($statements as $statement) {
                     $pdo->exec($statement);
+                }
+
+                // The migration layer is additive and is also the safe upgrade
+                // path for installations created by older releases.  Running it
+                // here completes a new installation without modifying a database
+                // that was not empty (the check above rejects those first).
+                require_once $root . '/app/bootstrap.php';
+                \App\Core\Database::init([
+                    'driver' => 'mysql', 'host' => $host, 'port' => 3306,
+                    'database' => $database, 'username' => $dbUser,
+                    'password' => $dbPassword, 'charset' => 'utf8mb4',
+                ]);
+                require_once $root . '/app/migrations.php';
+                run_schema_migrations();
+
+                $tableStatement = $pdo->prepare(
+                    'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?'
+                );
+                $missingTables = [];
+                foreach (installer_required_tables() as $table) {
+                    $tableStatement->execute([$table]);
+                    if ((int)$tableStatement->fetchColumn() !== 1) $missingTables[] = $table;
+                }
+                if ($missingTables !== []) {
+                    throw new RuntimeException('لم يكتمل مخطط قاعدة البيانات. لم تُنشأ كل الجداول المطلوبة.');
                 }
 
                 $algorithm = in_array('argon2id', password_algos(), true)
@@ -147,6 +209,9 @@ if (!$blocked && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
                 }
 
                 // Save config atomically and only after schema/admin creation succeeds.
+                // The migration include runs in this file's scope and may reuse
+                // generic variable names, so restore the installer-owned path.
+                $localConfig = $root . '/config/local.php';
                 $config = "<?php\nreturn " . var_export([
                     'db' => [
                         'driver' => 'mysql',

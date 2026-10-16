@@ -112,10 +112,10 @@ CREATE TABLE IF NOT EXISTS site_notifications (id BIGINT UNSIGNED AUTO_INCREMENT
 CREATE TABLE IF NOT EXISTS languages (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,code VARCHAR(20) NOT NULL UNIQUE,name VARCHAR(120) NOT NULL,flag VARCHAR(32) NULL,dir ENUM('rtl','ltr') NOT NULL DEFAULT 'ltr',enabled TINYINT(1) NOT NULL DEFAULT 1,is_default TINYINT(1) NOT NULL DEFAULT 0,sort_order INT NOT NULL DEFAULT 0,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX(enabled,sort_order)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO languages(code,name,flag,dir,enabled,is_default,sort_order) VALUES
-('ar','العربية','sy','rtl',1,1,0),
+('ar','ط§ظ„ط¹ط±ط¨ظٹط©','sy','rtl',1,1,0),
 ('en','English','gb','ltr',1,0,10),
-('es','Español','es','ltr',1,0,20),
-('fr','Français','fr','ltr',1,0,30)
+('es','Espaأ±ol','es','ltr',1,0,20),
+('fr','Franأ§ais','fr','ltr',1,0,30)
 ON DUPLICATE KEY UPDATE name=VALUES(name),flag=VALUES(flag),dir=VALUES(dir),enabled=VALUES(enabled),sort_order=VALUES(sort_order);
 UPDATE languages SET enabled=0 WHERE code NOT IN ('ar','en','es','fr');
 UPDATE languages SET is_default=IF(code='ar',1,0);
@@ -263,3 +263,206 @@ CREATE TABLE IF NOT EXISTS writer_username_redirects (
 CREATE TABLE IF NOT EXISTS editorial_message_attachments (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,message_id BIGINT UNSIGNED NOT NULL,path VARCHAR(500) NOT NULL,original_name VARCHAR(240) NOT NULL,mime_type VARCHAR(120) NOT NULL,size_bytes BIGINT UNSIGNED NOT NULL DEFAULT 0,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(message_id),FOREIGN KEY(message_id) REFERENCES editorial_messages(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Tables used by installed modules. Their column-level compatibility upgrades
+-- remain idempotent in app/migrations.php and are executed by install.php.
+
+CREATE TABLE IF NOT EXISTS book_service_requests (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,writer_id BIGINT UNSIGNED NOT NULL,status VARCHAR(30) NOT NULL DEFAULT 'pending',active_slot TINYINT UNSIGNED NULL DEFAULT 1,admin_note TEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_book_request_active(writer_id,active_slot),INDEX(status,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS book_agreements (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,request_id BIGINT UNSIGNED NOT NULL,writer_id BIGINT UNSIGNED NOT NULL,version INT UNSIGNED NOT NULL,terms LONGTEXT NOT NULL,fee DECIMAL(12,2) NOT NULL DEFAULT 0,currency VARCHAR(8) NOT NULL DEFAULT 'USD',payment_terms TEXT NULL,promo_scope TEXT NULL,rights_terms TEXT NULL,cancellation_terms TEXT NULL,service_start DATE NULL,service_end DATE NULL,listing_after_expiry TINYINT(1) NOT NULL DEFAULT 0,status VARCHAR(20) NOT NULL DEFAULT 'offered',payment_status VARCHAR(20) NOT NULL DEFAULT 'pending',accepted_snapshot LONGTEXT NULL,accepted_at DATETIME NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,UNIQUE KEY uq_book_agreement_version(request_id,version),INDEX(writer_id,status),INDEX(service_end)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS books (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,writer_id BIGINT UNSIGNED NOT NULL,agreement_id BIGINT UNSIGNED NOT NULL,title VARCHAR(240) NOT NULL,slug VARCHAR(260) NOT NULL,subtitle VARCHAR(240) NULL,genre VARCHAR(120) NULL,publisher VARCHAR(160) NULL,publication_year SMALLINT UNSIGNED NULL,isbn VARCHAR(32) NULL,book_language VARCHAR(40) NULL,page_count INT UNSIGNED NULL,book_format VARCHAR(80) NULL,description LONGTEXT NULL,front_media_id BIGINT UNSIGNED NULL,back_media_id BIGINT UNSIGNED NULL,purchase_url VARCHAR(1000) NULL,purchase_label VARCHAR(120) NULL,status VARCHAR(20) NOT NULL DEFAULT 'draft',is_featured TINYINT(1) NOT NULL DEFAULT 0,promo_directory TINYINT(1) NOT NULL DEFAULT 1,promo_profile TINYINT(1) NOT NULL DEFAULT 1,promo_home TINYINT(1) NOT NULL DEFAULT 0,published_at DATETIME NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_book_slug(slug),INDEX(writer_id,status,published_at),INDEX(status,is_featured)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS card_templates (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,type VARCHAR(64) NOT NULL,name VARCHAR(190) NOT NULL,version VARCHAR(60) NOT NULL,path VARCHAR(500) NOT NULL,is_active TINYINT(1) NOT NULL DEFAULT 0,uploaded_by BIGINT UNSIGNED NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,UNIQUE KEY card_template_type_version(type,version),INDEX(type,is_active),INDEX(uploaded_by,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS writer_application_history (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,application_id BIGINT UNSIGNED NOT NULL,from_status VARCHAR(40) NULL,to_status VARCHAR(40) NOT NULL,admin_id BIGINT UNSIGNED NULL,note TEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(application_id,created_at),INDEX(admin_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS translation_entry_states (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,translation_key VARCHAR(255) NOT NULL,locale VARCHAR(20) NOT NULL,state ENUM('untranslated','draft','translated','needs_review','approved') NOT NULL DEFAULT 'draft',source_hash CHAR(64) NULL,updated_by BIGINT UNSIGNED NULL,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_translation_entry_state(translation_key,locale),INDEX(locale,state)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS translation_imports (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,user_id BIGINT UNSIGNED NOT NULL,file_name VARCHAR(255) NOT NULL,file_format VARCHAR(12) NOT NULL,status ENUM('preview','confirmed','failed') NOT NULL DEFAULT 'preview',total_rows INT UNSIGNED NOT NULL DEFAULT 0,new_count INT UNSIGNED NOT NULL DEFAULT 0,updated_count INT UNSIGNED NOT NULL DEFAULT 0,unknown_count INT UNSIGNED NOT NULL DEFAULT 0,error_count INT UNSIGNED NOT NULL DEFAULT 0,report_json LONGTEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,confirmed_at DATETIME NULL,INDEX(user_id,created_at),INDEX(status,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS translation_import_rows (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,import_id BIGINT UNSIGNED NOT NULL,`row_number` INT UNSIGNED NOT NULL,translation_key VARCHAR(255) NULL,entity_type VARCHAR(40) NULL,entity_id BIGINT UNSIGNED NOT NULL DEFAULT 0,field_name VARCHAR(80) NULL,source_locale VARCHAR(20) NULL,source_text LONGTEXT NULL,source_hash CHAR(64) NULL,translations_json LONGTEXT NULL,action_name VARCHAR(30) NOT NULL DEFAULT 'skip',validation_state ENUM('valid','warning','error','unknown') NOT NULL DEFAULT 'valid',messages_json LONGTEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(import_id,`row_number`),INDEX(translation_key)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS media_folders (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,parent_id BIGINT UNSIGNED NULL,name VARCHAR(160) NOT NULL,created_by BIGINT UNSIGNED NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_media_folder(parent_id,name),INDEX(parent_id),INDEX(created_by),CONSTRAINT fk_media_folder_parent FOREIGN KEY(parent_id) REFERENCES media_folders(id) ON DELETE CASCADE,CONSTRAINT fk_media_folder_creator FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS media_tags (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,name VARCHAR(100) NOT NULL,slug VARCHAR(120) NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,UNIQUE KEY uq_media_tag_slug(slug)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS media_tag_map (media_id BIGINT UNSIGNED NOT NULL,tag_id BIGINT UNSIGNED NOT NULL,PRIMARY KEY(media_id,tag_id),CONSTRAINT fk_media_tag_map_media FOREIGN KEY(media_id) REFERENCES media(id) ON DELETE CASCADE,CONSTRAINT fk_media_tag_map_tag FOREIGN KEY(tag_id) REFERENCES media_tags(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS media_usages (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,media_id BIGINT UNSIGNED NOT NULL,entity_type VARCHAR(60) NOT NULL,entity_id BIGINT UNSIGNED NOT NULL,field_name VARCHAR(80) NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,UNIQUE KEY uq_media_usage(media_id,entity_type,entity_id,field_name),INDEX(entity_type,entity_id),CONSTRAINT fk_media_usage_media FOREIGN KEY(media_id) REFERENCES media(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS community_moderation_terms (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,phrase VARCHAR(255) NOT NULL,normalized_phrase VARCHAR(255) NOT NULL,exception_phrase VARCHAR(255) NULL,severity ENUM('warning','review','block') NOT NULL DEFAULT 'review',active TINYINT(1) NOT NULL DEFAULT 1,notes VARCHAR(500) NULL,created_by BIGINT UNSIGNED NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_community_moderation_term(normalized_phrase),INDEX(active,severity),CONSTRAINT fk_cmoderation_term_user FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS community_moderation_events (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,content_type ENUM('topic','reply') NOT NULL,content_id BIGINT UNSIGNED NOT NULL,user_id BIGINT UNSIGNED NOT NULL,severity ENUM('warning','review','block') NOT NULL,status ENUM('open','approved','rejected','dismissed') NOT NULL DEFAULT 'open',matched_terms LONGTEXT NULL,content_excerpt VARCHAR(1000) NULL,reviewed_by BIGINT UNSIGNED NULL,reviewed_at DATETIME NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(status,severity,created_at),INDEX(content_type,content_id),INDEX(user_id,created_at),CONSTRAINT fk_cmoderation_event_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,CONSTRAINT fk_cmoderation_event_reviewer FOREIGN KEY(reviewed_by) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS podcast_episodes (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            article_id BIGINT UNSIGNED NULL,
+            category_id BIGINT UNSIGNED NULL,
+            created_by BIGINT UNSIGNED NULL,
+            title VARCHAR(220) NOT NULL,
+            slug VARCHAR(220) NOT NULL,
+            excerpt TEXT NULL,
+            content MEDIUMTEXT NULL,
+            cover_image VARCHAR(500) NULL,
+            og_image VARCHAR(500) NULL,
+            episode_number INT UNSIGNED NULL,
+            duration VARCHAR(40) NULL,
+            audio_source ENUM('external','upload') NOT NULL DEFAULT 'external',
+            audio_url VARCHAR(1000) NOT NULL,
+            status ENUM('draft','published') NOT NULL DEFAULT 'draft',
+            published_at DATETIME NULL,
+            seo_title VARCHAR(255) NULL,
+            seo_description VARCHAR(320) NULL,
+            views BIGINT UNSIGNED NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_podcast_slug(slug),
+            INDEX(status,published_at),
+            INDEX(category_id,status),
+            INDEX(article_id),
+            CONSTRAINT fk_podcast_article FOREIGN KEY(article_id) REFERENCES articles(id) ON DELETE SET NULL,
+            CONSTRAINT fk_podcast_category FOREIGN KEY(category_id) REFERENCES categories(id) ON DELETE SET NULL,
+            CONSTRAINT fk_podcast_user FOREIGN KEY(created_by) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS khawatir_categories (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            slug VARCHAR(120) NOT NULL UNIQUE,
+            sort_order INT NOT NULL DEFAULT 0,
+            active TINYINT(1) NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS khawatir (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            author_id BIGINT UNSIGNED NOT NULL,
+            category_id BIGINT UNSIGNED NULL,
+            reviewed_by BIGINT UNSIGNED NULL,
+            body VARCHAR(1200) NOT NULL,
+            slug VARCHAR(220) NOT NULL UNIQUE,
+            ownership ENUM('original','quoted') NOT NULL DEFAULT 'original',
+            original_author VARCHAR(190) NULL,
+            source_name VARCHAR(255) NULL,
+            source_url VARCHAR(700) NULL,
+            image_path VARCHAR(500) NULL,
+            status ENUM('draft','review','changes','rejected','published') NOT NULL DEFAULT 'draft',
+            review_note TEXT NULL,
+            published_at DATETIME NULL,
+            views BIGINT UNSIGNED NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX(author_id,status,updated_at),
+            INDEX(category_id,status,published_at),
+            CONSTRAINT fk_khawatir_author FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE CASCADE,
+            CONSTRAINT fk_khawatir_category FOREIGN KEY(category_id) REFERENCES khawatir_categories(id) ON DELETE SET NULL,
+            CONSTRAINT fk_khawatir_reviewer FOREIGN KEY(reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS tag_translations (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            tag_id BIGINT UNSIGNED NOT NULL,
+            locale VARCHAR(20) NOT NULL,
+            name VARCHAR(160) NOT NULL,
+            slug VARCHAR(190) NOT NULL,
+            description TEXT NULL,
+            seo_title VARCHAR(255) NULL,
+            seo_description VARCHAR(320) NULL,
+            status ENUM('draft','review','published') NOT NULL DEFAULT 'published',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_tag_translation(tag_id,locale),
+            UNIQUE KEY uq_tag_translation_slug(locale,slug),
+            INDEX(locale,status),
+            CONSTRAINT fk_tag_translation_tag FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS podcast_episode_translations (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            episode_id BIGINT UNSIGNED NOT NULL,
+            locale VARCHAR(20) NOT NULL,
+            title VARCHAR(220) NOT NULL,
+            slug VARCHAR(220) NOT NULL,
+            excerpt TEXT NULL,
+            content MEDIUMTEXT NULL,
+            seo_title VARCHAR(255) NULL,
+            seo_description VARCHAR(320) NULL,
+            og_title VARCHAR(255) NULL,
+            og_description VARCHAR(320) NULL,
+            status ENUM('draft','review','published') NOT NULL DEFAULT 'draft',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_podcast_translation(episode_id,locale),
+            UNIQUE KEY uq_podcast_translation_slug(locale,slug),
+            INDEX(locale,status),
+            CONSTRAINT fk_podcast_translation_episode FOREIGN KEY(episode_id) REFERENCES podcast_episodes(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS khawatir_category_translations (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            category_id BIGINT UNSIGNED NOT NULL,
+            locale VARCHAR(20) NOT NULL,
+            name VARCHAR(120) NOT NULL,
+            slug VARCHAR(160) NOT NULL,
+            description TEXT NULL,
+            status ENUM('draft','review','published') NOT NULL DEFAULT 'published',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_khawatir_category_translation(category_id,locale),
+            UNIQUE KEY uq_khawatir_category_slug(locale,slug),
+            INDEX(locale,status),
+            CONSTRAINT fk_khawatir_category_translation FOREIGN KEY(category_id) REFERENCES khawatir_categories(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS khawatir_translations (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            khawatir_id BIGINT UNSIGNED NOT NULL,
+            locale VARCHAR(20) NOT NULL,
+            title VARCHAR(220) NULL,
+            slug VARCHAR(220) NOT NULL,
+            body VARCHAR(1600) NOT NULL,
+            description TEXT NULL,
+            seo_title VARCHAR(255) NULL,
+            seo_description VARCHAR(320) NULL,
+            status ENUM('draft','review','published') NOT NULL DEFAULT 'draft',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_khawatir_translation(khawatir_id,locale),
+            UNIQUE KEY uq_khawatir_translation_slug(locale,slug),
+            INDEX(locale,status),
+            CONSTRAINT fk_khawatir_translation FOREIGN KEY(khawatir_id) REFERENCES khawatir(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS writer_profile_translations (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            user_id BIGINT UNSIGNED NOT NULL,
+            locale VARCHAR(20) NOT NULL,
+            display_name VARCHAR(190) NULL,
+            bio TEXT NULL,
+            professional_title VARCHAR(190) NULL,
+            cv_summary TEXT NULL,
+            status ENUM('draft','review','published') NOT NULL DEFAULT 'draft',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uq_writer_profile_translation(user_id,locale),
+            INDEX(locale,status),
+            CONSTRAINT fk_writer_profile_translation_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS article_comments (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,article_id BIGINT UNSIGNED NOT NULL,parent_id BIGINT UNSIGNED NULL,user_id BIGINT UNSIGNED NULL,guest_name VARCHAR(120) NULL,guest_email VARCHAR(190) NULL,content TEXT NOT NULL,status ENUM('pending','approved','spam','trash') NOT NULL DEFAULT 'pending',ip_hash CHAR(64) NULL,user_agent VARCHAR(255) NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX(article_id,status,created_at),INDEX(parent_id),INDEX(user_id),CONSTRAINT fk_ac_article FOREIGN KEY(article_id) REFERENCES articles(id) ON DELETE CASCADE,CONSTRAINT fk_ac_parent FOREIGN KEY(parent_id) REFERENCES article_comments(id) ON DELETE CASCADE,CONSTRAINT fk_ac_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS content_translation_assignments (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,content_type VARCHAR(40) NOT NULL,content_id BIGINT UNSIGNED NOT NULL,target_locale VARCHAR(20) NOT NULL,translator_id BIGINT UNSIGNED NULL,reviewer_id BIGINT UNSIGNED NULL,assigned_by BIGINT UNSIGNED NULL,status ENUM('queued','in_progress','review','approved','cancelled') NOT NULL DEFAULT 'queued',notes TEXT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,UNIQUE KEY uq_content_translation_assignment(content_type,content_id,target_locale),INDEX(content_type,content_id),INDEX(translator_id,status),INDEX(reviewer_id,status),CONSTRAINT fk_translation_assignment_translator FOREIGN KEY(translator_id) REFERENCES users(id) ON DELETE SET NULL,CONSTRAINT fk_translation_assignment_reviewer FOREIGN KEY(reviewer_id) REFERENCES users(id) ON DELETE SET NULL,CONSTRAINT fk_translation_assignment_assigner FOREIGN KEY(assigned_by) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS writer_card_preferences (user_id BIGINT UNSIGNED PRIMARY KEY,template VARCHAR(30) NOT NULL DEFAULT 'classic',card_size VARCHAR(30) NOT NULL DEFAULT 'post',show_qr TINYINT(1) NOT NULL DEFAULT 1,show_stats TINYINT(1) NOT NULL DEFAULT 1,show_socials TINYINT(1) NOT NULL DEFAULT 1,quote_text VARCHAR(180) NULL,style_json LONGTEXT NULL,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,CONSTRAINT fk_writer_card_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS writer_application_messages (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,application_id BIGINT UNSIGNED NOT NULL,sender_id BIGINT UNSIGNED NULL,visibility ENUM('applicant','internal') NOT NULL DEFAULT 'applicant',body TEXT NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX(application_id,visibility,created_at),INDEX(sender_id),CONSTRAINT fk_wapp_message_application FOREIGN KEY(application_id) REFERENCES writer_applications(id) ON DELETE CASCADE,CONSTRAINT fk_wapp_message_sender FOREIGN KEY(sender_id) REFERENCES users(id) ON DELETE SET NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS email_notification_templates (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,event_key VARCHAR(100) NOT NULL UNIQUE,subject VARCHAR(255) NOT NULL,body_html LONGTEXT NULL,body_text LONGTEXT NULL,enabled TINYINT(1) NOT NULL DEFAULT 1,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS email_delivery_attempts (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,event_key VARCHAR(100) NOT NULL,recipient VARCHAR(255) NOT NULL,subject VARCHAR(255) NOT NULL,status ENUM('queued','accepted','failed') NOT NULL DEFAULT 'queued',attempts INT NOT NULL DEFAULT 0,error TEXT NULL,related_type VARCHAR(80) NULL,related_id BIGINT UNSIGNED NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,sent_at DATETIME NULL,INDEX(event_key,status),INDEX(related_type,related_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS writer_application_notes (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,application_id BIGINT UNSIGNED NOT NULL,author_id BIGINT UNSIGNED NULL,body TEXT NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX(application_id,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS story_submission_revisions (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,submission_id BIGINT UNSIGNED NOT NULL,revision_no INT UNSIGNED NOT NULL,title VARCHAR(220) NOT NULL,name VARCHAR(160) NOT NULL,story MEDIUMTEXT NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,INDEX(submission_id,revision_no)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

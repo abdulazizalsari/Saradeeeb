@@ -963,10 +963,12 @@ function site_navigation_catalog(string $locale): array {
             'community' => ['ar'=>'منتدى سراديب','en'=>'Saradeeeb community','es'=>'Comunidad Saradeeeb','fr'=>'Communauté Saradeeeb','ru'=>'Сообщество Saradeeeb'],
             'podcast' => ['ar'=>'بودكاست سراديب','en'=>'Saradeeeb podcast','es'=>'Podcast Saradeeeb','fr'=>'Podcast Saradeeeb','ru'=>'Подкаст Saradeeeb'],
             'khawatir' => ['ar'=>'خواطر','en'=>'Reflections','es'=>'Reflexiones','fr'=>'Réflexions','ru'=>'Размышления'],
-            'behind' => ['ar'=>'عن سراديب','en'=>'About Saradeeeb','es'=>'Acerca de Saradeeeb','fr'=>'À propos de Saradeeeb','ru'=>'О Saradeeeb'],
+            'behind' => ['ar'=>'من خلف سراديب','en'=>'About Saradeeeb','es'=>'Acerca de Saradeeeb','fr'=>'À propos de Saradeeeb','ru'=>'О Saradeeeb'],
         ];
         $fallbacks['contact']=['ar'=>'اتصل بنا','en'=>'Contact us','es'=>'Contáctanos','fr'=>'Contactez-nous','ru'=>'Связаться с нами'];
-        return translation_text('nav', $key, $locale, $fallbacks[$key][$locale] ?? $fallback);
+        $label=translation_text('nav', $key, $locale, $fallbacks[$key][$locale] ?? $fallback);
+        // Keep existing custom labels, but update the legacy Arabic About wording.
+        return $key==='behind' && $locale==='ar' && trim($label)==='عن سراديب' ? 'من خلف سراديب' : $label;
     };
     $items = [
         'home' => ['label'=>tr('home',$locale),'url'=>locale_url($locale),'icon'=>'home','target'=>'_self'],
@@ -978,7 +980,7 @@ function site_navigation_catalog(string $locale): array {
         'podcast' => ['label'=>$navLabel('podcast','بودكاست سراديب'),'url'=>locale_url($locale,'podcast'),'icon'=>'podcast','target'=>'_self'],
         'khawatir' => ['label'=>$navLabel('khawatir','خواطر'),'url'=>locale_url($locale,'khawatir'),'icon'=>'quote','target'=>'_self'],
         // Resolve the editable page by identity so renamed slugs stay linked.
-        'behind' => ['label'=>$navLabel('behind','عن سراديب'),'url'=>\App\Services\BehindPage::url($locale),'icon'=>'book','target'=>'_self'],
+        'behind' => ['label'=>$navLabel('behind','من خلف سراديب'),'url'=>\App\Services\BehindPage::url($locale),'icon'=>'book','target'=>'_self'],
         'contact' => ['label'=>$navLabel('contact','اتصل بنا'),'url'=>locale_url($locale,'contact'),'icon'=>'mail','target'=>'_self'],
         'login' => ['label'=>tr('login',$locale),'url'=>locale_url($locale,'login'),'icon'=>'login','target'=>'_self'],
         'dashboard' => ['label'=>tr('dashboard',$locale),'url'=>is_editor()?url('/admin'):(((auth_user()['role']??'')==='member')?locale_url($locale,'community/member/'.(auth_user()['username']??'')):url('/writer')),'icon'=>'dashboard','target'=>'_self'],
@@ -1116,7 +1118,7 @@ function configured_navigation(string $locale,string $location='header'): array 
             $placement=\App\Services\ManagedPages::placement((int)$item['page_id']);
             $item['column']=$placement['column']; $item['order']=(int)$placement['order'];
             $label=trim((string)($placement['labels'][$locale]??''));
-            if($label!=='') $item['label']=$label;
+            if($label!=='') $item['label']=$key==='behind' && $locale==='ar' && $label==='عن سراديب' ? 'من خلف سراديب' : $label;
         }
         $item['key']=$key;
         $out[]=$item;
