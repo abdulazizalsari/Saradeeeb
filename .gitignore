@@ -3,12 +3,29 @@
 /.env
 /.env.*
 !/.env.example
-/admin-filament/.env
-/admin-filament/.env.*
-!/admin-filament/.env.example
 
 # Runtime data: keep outside source control and include in backups.
 /storage/*.log
 /storage/*.sql
 /storage/backups/
+/storage/dev-mysql/
+/storage/dev-php.ini
+/storage/dev-setup.php
+/storage/dev-access.txt
 /uploads/
+
+# All remaining storage contents are runtime data, test artefacts, or managed
+# templates. Keep only the directory marker in source control.
+/storage/*
+!/storage/.gitkeep
+/.continue/
+
+# Never commit local archives, database exports, credentials, or key material.
+*.sql
+*.sql.gz
+*.bak
+*.key
+*.pem
+*.zip
+*.rar
+*.7z

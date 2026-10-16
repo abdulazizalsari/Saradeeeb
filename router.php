@@ -5,7 +5,7 @@ $path=parse_url($_SERVER['REQUEST_URI']??'/',PHP_URL_PATH)?:'/';
 $root=realpath(__DIR__)?:__DIR__;
 $relative=ltrim(rawurldecode($path),'/');
 $topLevel=strtolower((string)strtok($relative,'/'));
-$blockedDirectories=['app','config','database','storage','cron','tools','tests','admin-filament'];
+$blockedDirectories=['app','config','database','storage','cron','tools','tests'];
 $extension=strtolower((string)pathinfo($relative,PATHINFO_EXTENSION));
 $initialInstaller = $relative === 'install.php' && !is_file(__DIR__ . '/config/local.php');
 

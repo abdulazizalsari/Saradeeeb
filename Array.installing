@@ -1,0 +1,18 @@
+<?php
+return array (
+  'db' => 
+  array (
+    'driver' => 'mysql',
+    'host' => '127.0.0.1',
+    'port' => 3306,
+    'database' => 'saradeeeb_local_final',
+    'username' => 'saradeeeb_app',
+    'password' => 'SaradeeebApp2026!',
+    'charset' => 'utf8mb4',
+  ),
+  'app' => 
+  array (
+    'base_url' => 'http://127.0.0.1:8000',
+    'debug' => false,
+  ),
+);
