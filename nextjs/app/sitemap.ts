@@ -1,0 +1,14 @@
+import type {MetadataRoute} from "next";
+import {listPublishedArticles} from "../lib/articles";
+export const dynamic="force-dynamic";
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{
+ const origin=(process.env.NEXT_PUBLIC_SITE_URL??"https://saradeeeb-preview.vercel.app").replace(/\/$/,"");
+ const items:MetadataRoute.Sitemap=[{url:origin+"/",changeFrequency:"daily",priority:1}];
+ for(const locale of ["ar","en","es","fr","ru"]){
+  items.push({url:origin+"/"+locale,changeFrequency:"daily",priority:.8});
+  try{for(const article of await listPublishedArticles(locale,50)){
+   items.push({url:origin+"/"+locale+"/article/"+encodeURIComponent(article.slug),lastModified:article.published_at??undefined,changeFrequency:"monthly",priority:.7});
+  }}catch(e){console.error("sitemap locale error",locale,e);}
+ }
+ return items;
+}
