@@ -8,3 +8,31 @@
 .site-header .mobile-navigation nav a:hover{background:rgba(42,150,155,.12);color:var(--accent2)}
 @media(max-width:760px){.site-header .mobile-navigation{display:block}.site-header .main-nav{display:none}.site-header .header-inner{display:flex;flex-wrap:nowrap}.site-header .header-actions{margin-inline-start:auto}}
 @media(max-width:480px){.site-header .mini-search{display:none}}
+
+/* WordPress footer recreation from supplied mobile screenshots. */
+.wp-original-footer{background:linear-gradient(160deg,#0d1624 0%,#080d15 75%);color:#f5f7f9;padding:0;border:0;direction:rtl}
+.wp-original-footer .wp-footer-inner{padding-top:36px;padding-bottom:36px}
+.wp-original-footer .wp-footer-intro{display:flex;flex-direction:column;align-items:flex-start;gap:24px}
+.wp-original-footer .wp-footer-logo{display:flex;flex-direction:column;align-items:center;color:#4cc6c7;font-size:24px;font-weight:800;min-width:105px;text-shadow:0 0 15px rgba(32,202,208,.3)}
+.wp-original-footer .wp-footer-logo-mark{font-size:55px;line-height:1;color:#2bbac0}
+.wp-original-footer .wp-footer-intro p{font-size:19px;line-height:2;color:#adb6c2;margin:14px 0}
+.wp-original-footer .wp-footer-story{display:inline-flex;align-items:center;gap:20px;padding:19px 28px;background:linear-gradient(110deg,#37d3d5,#179da9);border-radius:13px;color:#07131c;font-weight:800;font-size:21px;box-shadow:0 12px 35px rgba(13,174,180,.2);text-decoration:none}
+.wp-original-footer .wp-footer-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:42px;margin-top:62px}
+.wp-original-footer .wp-footer-sections section{min-width:0}
+.wp-original-footer .wp-footer-sections h2{font-size:27px;font-weight:800;color:#fff;margin:0 0 36px}
+.wp-original-footer .wp-footer-sections h2:after{content:"";display:block;width:60px;height:5px;border-radius:8px;background:#23b4bb;margin-top:14px}
+.wp-original-footer .wp-footer-sections nav{display:flex;flex-direction:column;align-items:flex-start;gap:27px}
+.wp-original-footer .wp-footer-sections nav a{display:block;color:#aab5c2;text-decoration:none;font-size:19px;line-height:1.6}
+.wp-original-footer .wp-footer-sections section:not(.wp-footer-contact) nav a:before{content:"◂";color:#2dbcc3;font-size:12px;margin-left:14px}
+.wp-original-footer .wp-footer-contact p{font-size:19px;color:#aab5c2;line-height:2}
+.wp-original-footer .wp-footer-contact-link{display:inline-block!important;padding:16px 27px!important;border:1px solid #248b93;border-radius:12px;color:#69dcdd!important;font-weight:800}
+.wp-original-footer .wp-footer-contact h3{color:#fff;font-size:22px;margin:32px 0 22px}
+.wp-original-footer .wp-footer-social{display:flex;flex-direction:row;gap:16px;flex-wrap:wrap}
+.wp-original-footer .wp-footer-social a{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;border:1px solid #404852;background:#171e27;color:#fff;text-decoration:none;font-size:24px}
+.wp-original-footer .wp-footer-bottom{background:#080b13;border-top:1px solid #252d38;padding:24px 0}
+.wp-original-footer .wp-footer-bottom .container{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.wp-original-footer .wp-footer-bottom p{margin:0;color:#fff;font-size:16px}
+.wp-original-footer .wp-footer-bottom nav{display:flex;flex-direction:row;gap:20px;align-items:center}
+.wp-original-footer .wp-footer-bottom nav a{color:#e4e6e9;text-decoration:none}
+.wp-original-footer .wp-footer-bottom nav span{color:#29bfc5}
+@media(max-width:760px){.wp-original-footer .wp-footer-sections{display:flex;flex-direction:column;gap:62px;margin-top:55px}.wp-original-footer .wp-footer-intro{align-items:flex-start}.wp-original-footer .wp-footer-sections nav{gap:29px}.wp-original-footer .wp-footer-bottom .container{flex-direction:column;align-items:flex-start}.wp-original-footer .wp-footer-social{flex-direction:row}.wp-original-footer .wp-footer-inner{padding-bottom:50px}}
