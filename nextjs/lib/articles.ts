@@ -1,23 +1,15 @@
 import "server-only";
 import {Pool} from "pg";
-export type Article={title:string;slug:string;excerpt:string|null;content:string;featured_image:string|null;published_at:Date|null;author_name:string};
+export type Article={title:string;slug:string;excerpt:string|null;content:string;featured_image:string|null;published_at:Date|null;author_name:string;category?:string;categorySlug?:string;sourceUrl?:string};
+export type Category={id:number;name:string;slug:string;count:number};
 const locales=new Set(["ar","en","es","fr","ru"]);
+const WP_BASE=(process.env.WORDPRESS_URL||"https://saradeeeb.com").replace(/\/$/,"");
 let pool:Pool|null=null;
 function connection(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false},max:4,connectionTimeoutMillis:5000}));}
-export async function findPublishedArticle(locale:string,slug:string):Promise<Article|null>{
-if(!locales.has(locale)||slug.length>220)return null;
-const conn=connection();if(!conn)return null;
-const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name
-FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id
-WHERE t.locale=$1 AND t.slug=$2 AND t.status='published' AND a.status='published' LIMIT 1`,[locale,slug]);
-return result.rows[0]??null;
-}
-export async function listPublishedArticles(locale:string,limit=24):Promise<Article[]>{
-if(!locales.has(locale))return [];
-const conn=connection();if(!conn)return [];
-const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name
-FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id
-WHERE t.locale=$1 AND t.status='published' AND a.status='published'
-ORDER BY a.published_at DESC LIMIT $2`,[locale,Math.min(50,Math.max(1,limit))]);
-return result.rows;
-}
+function plain(s:unknown){return String(s??"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#039;|&#8217;/g,"'").replace(/\s+/g," ").trim();}
+function safeUrl(s:unknown){const value=String(s||"");try{const u=new URL(value);return ["https:","http:"].includes(u.protocol)?u.href:null}catch{return null}}
+async function wp(path:string):Promise<any>{try{const res=await fetch(WP_BASE+"/wp-json/wp/v2/"+path,{next:{revalidate:300},signal:AbortSignal.timeout(6500),headers:{Accept:"application/json"}});if(!res.ok)return null;return await res.json()}catch{return null}}
+function fromWP(p:any):Article{const media=p?._embedded?.["wp:featuredmedia"]?.[0];const term=(p?._embedded?.["wp:term"]||[]).flat().find((t:any)=>t?.taxonomy==="category");return {title:plain(p?.title?.rendered),slug:String(p?.slug||""),excerpt:plain(p?.excerpt?.rendered)||null,content:String(p?.content?.rendered||""),featured_image:safeUrl(media?.source_url||p?.jetpack_featured_media_url),published_at:p?.date?new Date(p.date):null,author_name:plain(p?._embedded?.author?.[0]?.name)||"سراديب",category:term?.name,categorySlug:term?.slug,sourceUrl:safeUrl(p?.link)||undefined}}
+export async function listCategories():Promise<Category[]>{const data=await wp("categories?per_page=100&hide_empty=true");return Array.isArray(data)?data.map((x:any)=>({id:Number(x.id),name:plain(x.name),slug:String(x.slug),count:Number(x.count)||0})).filter(x=>x.slug):[]}
+export async function findPublishedArticle(locale:string,slug:string):Promise<Article|null>{if(!locales.has(locale)||slug.length>220)return null;const conn=connection();if(conn){try{const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id WHERE t.locale=$1 AND t.slug=$2 AND t.status='published' AND a.status='published' LIMIT 1`,[locale,slug]);if(result.rows[0])return result.rows[0]}catch(e){console.error("Article database query failed",e)}}if(locale!=="ar")return null;const data=await wp("posts?slug="+encodeURIComponent(slug)+"&_embed=1");return Array.isArray(data)&&data[0]?fromWP(data[0]):null}
+export async function listPublishedArticles(locale:string,limit=24,options?:{page?:number;search?:string;category?:number}):Promise<Article[]>{if(!locales.has(locale))return [];const page=Math.max(1,Math.min(100,Number(options?.page)||1));const count=Math.min(100,Math.max(1,limit));const hasFilters=Boolean(options?.search||options?.category);const conn=connection();if(conn&&!hasFilters){try{const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id WHERE t.locale=$1 AND t.status='published' AND a.status='published' ORDER BY a.published_at DESC LIMIT $2 OFFSET $3`,[locale,count,(page-1)*count]);if(result.rows.length)return result.rows}catch(e){console.error("Article list query failed",e)}}if(locale!=="ar")return [];const query=new URLSearchParams({per_page:String(count),page:String(page),_embed:"1"});if(options?.search)query.set("search",options.search.slice(0,100));if(options?.category)query.set("categories",String(options.category));const data=await wp("posts?"+query.toString());return Array.isArray(data)?data.map(fromWP):[]}
