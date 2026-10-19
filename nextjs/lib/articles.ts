@@ -5,7 +5,7 @@ export type Category={id:number;name:string;slug:string;count:number};
 const locales=new Set(["ar","en","es","fr","ru"]);
 let pool:Pool|null=null;
 function connection(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false},max:4,connectionTimeoutMillis:5000}));}
-export async function listCategories():Promise<Category[]>{return []}
+export async function listCategories():Promise<Category[]>{const conn=connection();if(!conn)return [];try{const result=await conn.query<Category>(`SELECT c.id,ct.name,ct.slug,0::int AS count FROM categories c JOIN category_translations ct ON ct.category_id=c.id WHERE c.active=1 AND ct.locale='ar' AND ct.status='published' ORDER BY c.sort_order ASC,c.id ASC`);return result.rows}catch(e){console.error('Category list failed',e);return []}}
 export async function findPublishedArticle(locale:string,slug:string):Promise<Article|null>{
 if(!locales.has(locale)||slug.length>220)return null;
 const conn=connection();if(!conn)return null;
