@@ -1,44 +1,10 @@
-/* Scoped header/footer repairs. The rest of the homepage is intentionally unchanged. */
-.site-header .header-inner{min-height:78px;height:auto}
-.site-header .brand{flex-shrink:0}
-.site-header .main-nav{min-width:0}
-.site-header .main-nav a{white-space:nowrap}
-.site-footer .footer-grid a:focus-visible,.site-header a:focus-visible,.site-header button:focus-visible{outline:2px solid var(--accent2);outline-offset:4px}
-.site-footer .footer-grid a:hover{color:var(--accent2)}
-@media(max-width:1050px){
- .site-header .header-inner{gap:14px;flex-wrap:wrap;padding-block:12px}
- .site-header .main-nav{order:3;width:100%;justify-content:center;flex-wrap:wrap;gap:12px 22px;margin-inline:0}
- .site-header .header-actions{margin-inline-start:auto}
- .site-header .mini-search input{width:110px}
-}
-@media(max-width:640px){
- .site-header .header-inner{gap:10px}
- .site-header .brand strong{font-size:17px}
- .site-header .brand small{font-size:9px}
- .site-header .mini-search{max-width:140px}
- .site-header .mini-search input{min-width:0;width:90px}
- .site-header .main-nav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;gap:18px;padding-block:5px 10px;scrollbar-width:thin}
- .site-header .main-nav a{flex-shrink:0;font-size:13px}
- .site-footer{padding-top:38px}
- .site-footer .footer-grid{grid-template-columns:1fr;gap:24px}
- .site-footer .copyright{margin-top:30px}
-}
-
-/* Visible on desktop as well as mobile: original teal brand detailing. */
-.site-header{border-bottom:1px solid rgba(42,150,155,.32)}
-.site-header .brand-mark{box-shadow:0 0 0 3px rgba(21,113,118,.12)}
-.site-header .main-nav a:hover,.site-header .main-nav a:focus-visible{color:var(--accent2)}
-.site-footer{border-top:2px solid var(--accent);background:#08090b}
-.site-footer .footer-grid h3{color:var(--text);border-bottom:1px solid rgba(42,150,155,.24);padding-bottom:12px}
-.site-footer .copyright{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-
-/* Functional responsive navigation in the original dark visual language. */
+/* Original header/footer styles are provided by original-site.css (copied from assets/css/app.css).
+   Only the Next.js mobile disclosure, absent from the legacy PHP markup, needs bridging. */
 .site-header .mobile-navigation{display:none;position:relative}
 .site-header .mobile-navigation summary{list-style:none;cursor:pointer;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:22px}
 .site-header .mobile-navigation summary::-webkit-details-marker{display:none}
 .site-header .mobile-navigation nav{position:absolute;inset-inline-end:0;top:calc(100% + 12px);width:min(280px,calc(100vw - 32px));padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.45);z-index:80;display:grid;gap:2px}
 .site-header .mobile-navigation nav a{display:block;padding:11px 14px;border-radius:8px;color:var(--text)}
 .site-header .mobile-navigation nav a:hover{background:rgba(42,150,155,.12);color:var(--accent2)}
-.site-footer .copyright a{color:var(--accent2);text-decoration:none}
-@media(max-width:760px){.site-header .main-nav{display:none}.site-header .mobile-navigation{display:block}.site-header .header-inner{flex-wrap:nowrap}.site-header .header-actions{margin-inline-start:auto}}
+@media(max-width:760px){.site-header .mobile-navigation{display:block}.site-header .main-nav{display:none}.site-header .header-inner{display:flex;flex-wrap:nowrap}.site-header .header-actions{margin-inline-start:auto}}
 @media(max-width:480px){.site-header .mini-search{display:none}}
