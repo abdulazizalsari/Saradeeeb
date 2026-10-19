@@ -26,3 +26,6 @@
 .article-detail .article-body p{font-size:18px;line-height:2.1;margin-bottom:22px;overflow-wrap:anywhere}
 @media(max-width:850px){.archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.archive-page,.article-detail{padding-block:24px 45px}.archive-grid{grid-template-columns:minmax(0,1fr);gap:14px}.archive-card img{height:185px}.article-detail .article-body p{font-size:16px}.archive-categories a{font-size:12px;padding:7px 10px}}
+
+/* Keep article and archive typography identical to the original Saradeeeb stylesheet. */
+.archive-page,.article-detail,.archive-page input,.archive-page button,.archive-page a,.article-detail a,.article-detail p,.archive-card{font-family:"Noto Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif}
