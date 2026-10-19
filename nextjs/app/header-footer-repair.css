@@ -102,3 +102,32 @@
  .wp-reference-header .wp-mobile-categories>div a{padding:12px 8px;background:#272e32;border-radius:7px;color:#fff;text-decoration:none;text-align:center;font-size:13px}
 }
 @media(max-width:380px){.wp-news-ticker .wp-ticker-label{padding-inline:10px;font-size:12px}.wp-news-ticker .wp-ticker-items{font-size:12px}.wp-reference-header .wp-header-inner{min-height:78px}.wp-reference-header .wp-header-logo{font-size:17px}.wp-reference-header .wp-keyhole{font-size:35px}.wp-reference-header .wp-mobile-navigation>summary{width:47px;height:47px}}
+
+/* Desktop footer: four fixed logical columns exactly as the supplied reference.
+   Right to left: identity, explore, categories, contact. */
+@media(min-width:901px){
+ .wp-original-footer .wp-footer-inner{display:grid!important;grid-template-columns:minmax(0,1.12fr) minmax(0,2.88fr);column-gap:clamp(28px,4vw,72px);padding-top:66px;padding-bottom:60px;align-items:start;max-width:1360px}
+ .wp-original-footer .wp-footer-intro{min-width:0;gap:20px;align-items:flex-start}
+ .wp-original-footer .wp-footer-logo{align-self:flex-start}
+ .wp-original-footer .wp-footer-intro p{font-size:clamp(14px,1.18vw,18px);line-height:1.95;margin:12px 0}
+ .wp-original-footer .wp-footer-story{font-size:clamp(15px,1.25vw,19px);padding:15px 22px}
+ .wp-original-footer .wp-footer-sections{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,52px);margin-top:0!important;min-width:0}
+ .wp-original-footer .wp-footer-sections h2{font-size:clamp(19px,1.7vw,26px);white-space:normal;line-height:1.35;margin:0 0 28px}
+ .wp-original-footer .wp-footer-sections nav{gap:20px}
+ .wp-original-footer .wp-footer-sections nav a{font-size:clamp(14px,1.15vw,18px);line-height:1.7}
+ .wp-original-footer .wp-footer-contact p{font-size:clamp(14px,1.15vw,18px);line-height:1.9;margin:0 0 16px}
+ .wp-original-footer .wp-footer-social{display:flex;flex-wrap:wrap;gap:10px}
+ .wp-original-footer .wp-footer-social a{width:clamp(34px,3.5vw,46px);height:clamp(34px,3.5vw,46px);font-size:19px;flex:0 0 auto}
+ .wp-original-footer .wp-footer-bottom .container{max-width:1360px}
+}
+@media(min-width:761px) and (max-width:900px){
+ .wp-original-footer .wp-footer-inner{display:grid;grid-template-columns:1fr 2fr;gap:22px}
+ .wp-original-footer .wp-footer-sections{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:0}
+ .wp-original-footer .wp-footer-sections h2{font-size:18px}
+ .wp-original-footer .wp-footer-sections nav a{font-size:13px}
+ .wp-original-footer .wp-footer-contact p{font-size:13px}
+ .wp-original-footer .wp-footer-social{gap:6px}
+ .wp-original-footer .wp-footer-social a{width:33px;height:33px;font-size:16px}
+}
+.wp-original-footer,.wp-original-footer *{box-sizing:border-box}
+.wp-original-footer .wp-footer-inner,.wp-original-footer .wp-footer-sections,.wp-original-footer .wp-footer-intro{min-width:0}
