@@ -36,3 +36,28 @@
 .wp-original-footer .wp-footer-bottom nav a{color:#e4e6e9;text-decoration:none}
 .wp-original-footer .wp-footer-bottom nav span{color:#29bfc5}
 @media(max-width:760px){.wp-original-footer .wp-footer-sections{display:flex;flex-direction:column;gap:62px;margin-top:55px}.wp-original-footer .wp-footer-intro{align-items:flex-start}.wp-original-footer .wp-footer-sections nav{gap:29px}.wp-original-footer .wp-footer-bottom .container{flex-direction:column;align-items:flex-start}.wp-original-footer .wp-footer-social{flex-direction:row}.wp-original-footer .wp-footer-inner{padding-bottom:50px}}
+
+/* Compact, thumb-friendly mobile footer; desktop stays unchanged. */
+@media (max-width:760px){
+ .wp-original-footer .wp-footer-inner{padding-top:22px;padding-bottom:24px}
+ .wp-original-footer .wp-footer-intro{gap:10px}
+ .wp-original-footer .wp-footer-logo{min-width:0;font-size:18px}
+ .wp-original-footer .wp-footer-logo-mark{font-size:34px}
+ .wp-original-footer .wp-footer-intro p{font-size:14px;line-height:1.85;margin:6px 0}
+ .wp-original-footer .wp-footer-story{padding:11px 18px;font-size:15px;gap:12px;border-radius:9px}
+ .wp-original-footer .wp-footer-sections{gap:24px;margin-top:28px}
+ .wp-original-footer .wp-footer-sections h2{font-size:19px;margin-bottom:15px}
+ .wp-original-footer .wp-footer-sections h2:after{width:42px;height:3px;margin-top:8px}
+ .wp-original-footer .wp-footer-sections nav{gap:9px}
+ .wp-original-footer .wp-footer-sections nav a{font-size:14px;line-height:1.65}
+ .wp-original-footer .wp-footer-sections section:not(.wp-footer-contact) nav a:before{margin-left:9px}
+ .wp-original-footer .wp-footer-contact p{font-size:14px;line-height:1.8;margin:0 0 14px}
+ .wp-original-footer .wp-footer-contact-link{padding:10px 16px!important;font-size:14px}
+ .wp-original-footer .wp-footer-contact h3{font-size:17px;margin:20px 0 12px}
+ .wp-original-footer .wp-footer-social{gap:9px}
+ .wp-original-footer .wp-footer-social a{width:38px;height:38px;font-size:18px}
+ .wp-original-footer .wp-footer-bottom{padding:16px 0}
+ .wp-original-footer .wp-footer-bottom .container{gap:10px}
+ .wp-original-footer .wp-footer-bottom p{font-size:12px;line-height:1.7}
+ .wp-original-footer .wp-footer-bottom nav{gap:10px;flex-wrap:wrap;font-size:12px}
+}
