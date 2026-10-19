@@ -23,3 +23,11 @@
  .site-footer .footer-grid{grid-template-columns:1fr;gap:24px}
  .site-footer .copyright{margin-top:30px}
 }
+
+/* Visible on desktop as well as mobile: original teal brand detailing. */
+.site-header{border-bottom:1px solid rgba(42,150,155,.32)}
+.site-header .brand-mark{box-shadow:0 0 0 3px rgba(21,113,118,.12)}
+.site-header .main-nav a:hover,.site-header .main-nav a:focus-visible{color:var(--accent2)}
+.site-footer{border-top:2px solid var(--accent);background:#08090b}
+.site-footer .footer-grid h3{color:var(--text);border-bottom:1px solid rgba(42,150,155,.24);padding-bottom:12px}
+.site-footer .copyright{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
