@@ -6,10 +6,13 @@ let pool:Pool|null=null;
 function connection(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false},max:4,connectionTimeoutMillis:5000}));}
 export async function findPublishedArticle(locale:string,slug:string):Promise<Article|null>{
 if(!locales.has(locale)||slug.length>220)return null;
+let normalized=slug;
+try{normalized=decodeURIComponent(slug);}catch{}
+const candidates=[...new Set([slug,normalized,encodeURIComponent(normalized)])];
 const conn=connection();if(!conn)return null;
 const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name
 FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id
-WHERE t.locale=$1 AND t.slug=$2 AND t.status='published' AND a.status='published' LIMIT 1`,[locale,slug]);
+WHERE t.locale=$1 AND t.slug=ANY($2::text[]) AND t.status='published' AND a.status='published' LIMIT 1`,[locale,candidates]);
 return result.rows[0]??null;
 }
 export async function listPublishedArticles(locale:string,limit=24):Promise<Article[]>{
