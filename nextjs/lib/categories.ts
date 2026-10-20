@@ -1,7 +1,7 @@
 import "server-only";
 import {Pool} from "pg";
 let pool:Pool|null=null;
-function db(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false},max:3,connectionTimeoutMillis:5000}));}
+function db(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL_INSECURE==="true"?{rejectUnauthorized:false}:{rejectUnauthorized:true},max:3,connectionTimeoutMillis:5000}));}
 export type Category={id:string;name:string;slug:string;description:string|null};
 export type CategoryArticle={title:string;slug:string;excerpt:string|null;featured_image:string|null};
 export async function listCategories(locale:string):Promise<Category[]>{
