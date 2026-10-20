@@ -2,8 +2,8 @@
 
 **Status: PARTIAL / NOT ACCEPTED.**
 
-Completed: documented partial route map, added live `sitemap.xml` and `feed.xml` backed by published Neon articles, basic `llms.txt`, and changed `robots.txt` from disallow-all to allow public content while disallowing private routes. SEO origin is configurable.
+Completed: dynamic category detail pages backed by restored category translations and article relationships; homepage category navigation; live sitemap and RSS, robots public indexing, llms.txt, partial route map.
 
-Outstanding: exhaustive 143-route map; public pages, `llms-full.txt`, `/ad/click/{id}`, legacy redirects, complete canonical slug handling and per-route comparisons.
+Outstanding: complete 143 public routes and views, other content types, llms-full.txt, ad click redirects, full legacy URL redirects and browser route sweep.
 
-Tests: source checks only; automated live HTTP route sweep **not run**. Missing pages remain blockers.
+Tests: source-level changes and direct Neon category count verification only. HTTP route sweep not run.
