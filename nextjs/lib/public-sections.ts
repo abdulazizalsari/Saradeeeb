@@ -28,7 +28,7 @@ export async function listCommunityTopics(locale:string):Promise<CommunityTopic[
  if(!locales.has(locale))return [];
  const conn=db();if(!conn)return [];
  const result=await conn.query<CommunityTopic>(`SELECT id,title,slug,excerpt,created_at,replies_count FROM community_topics
- WHERE locale=$1 AND status='published' ORDER BY pinned DESC,last_activity_at DESC NULLS LAST,created_at DESC LIMIT 100`,[locale]);
+ WHERE locale=$1 AND status='open' ORDER BY pinned DESC,last_activity_at DESC NULLS LAST,created_at DESC LIMIT 100`,[locale]);
  return result.rows;
 }
 
@@ -37,12 +37,12 @@ export async function findCommunityTopic(locale:string,slug:string):Promise<(Com
  if(!locales.has(locale)||slug.length>500)return null;
  const conn=db();if(!conn)return null;
  const decoded=(()=>{try{return decodeURIComponent(slug)}catch{return slug}})();
- const result=await conn.query<CommunityTopic&{content:string}>(`SELECT id,title,slug,excerpt,content,created_at,replies_count FROM community_topics WHERE locale=$1 AND slug=ANY($2::text[]) AND status='published' LIMIT 1`,[locale,[...new Set([slug,decoded])]]);
+ const result=await conn.query<CommunityTopic&{content:string}>(`SELECT id,title,slug,excerpt,content,created_at,replies_count FROM community_topics WHERE locale=$1 AND slug=ANY($2::text[]) AND status='open' LIMIT 1`,[locale,[...new Set([slug,decoded])]]);
  return result.rows[0]??null;
 }
 export async function listCommunityReplies(topicId:string):Promise<CommunityReply[]>{
  const conn=db();if(!conn)return [];
- const result=await conn.query<CommunityReply>(`SELECT id,content,created_at FROM community_replies WHERE topic_id=$1 AND status='published' ORDER BY created_at ASC LIMIT 200`,[topicId]);
+ const result=await conn.query<CommunityReply>(`SELECT id,content,created_at FROM community_replies WHERE topic_id=$1 AND status='visible' ORDER BY created_at ASC LIMIT 200`,[topicId]);
  return result.rows;
 }
 
