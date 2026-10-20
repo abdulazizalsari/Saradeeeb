@@ -9,3 +9,5 @@ Outstanding: complete 143 public routes and views, other content types, llms-ful
 Tests: source-level changes and direct Neon category count verification only. HTTP route sweep not run.
 
 Added a dynamic permanent redirect for legacy root-level article slugs after matching them against published Neon translations. This is partial legacy compatibility, not a complete redirect map.
+
+2026-10-20: Search now queries all published article text in Neon instead of only the first 50 rows; added locale-aware search direction and live llms-full.txt article index. Homepage browse-by-category panel now links to restored original categories. Search SQL was validated directly against Neon with a known article title. End-to-end HTTP tests still pending.
