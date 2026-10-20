@@ -2,7 +2,7 @@ import "server-only";
 import {Pool} from "pg";
 const locales=new Set(["ar","en","es","fr","ru"]);
 let pool:Pool|undefined;
-function db(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:{rejectUnauthorized:false},max:3,connectionTimeoutMillis:5000}));}
+function db(){if(!process.env.DATABASE_URL)return null;return pool??(pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL_INSECURE==="true"?{rejectUnauthorized:false}:{rejectUnauthorized:true},max:3,connectionTimeoutMillis:5000}));}
 export type PodcastEpisode={id:string;title:string;slug:string;excerpt:string|null;cover_image:string|null;audio_url:string|null;duration:string|null;published_at:Date|null};
 export async function listPodcastEpisodes(locale:string):Promise<PodcastEpisode[]>{
  if(!locales.has(locale))return [];
