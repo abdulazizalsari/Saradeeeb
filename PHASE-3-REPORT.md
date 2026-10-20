@@ -7,3 +7,5 @@ Completed: dynamic category detail pages backed by restored category translation
 Outstanding: complete 143 public routes and views, other content types, llms-full.txt, ad click redirects, full legacy URL redirects and browser route sweep.
 
 Tests: source-level changes and direct Neon category count verification only. HTTP route sweep not run.
+
+Added a dynamic permanent redirect for legacy root-level article slugs after matching them against published Neon translations. This is partial legacy compatibility, not a complete redirect map.
