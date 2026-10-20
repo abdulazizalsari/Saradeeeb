@@ -19,7 +19,7 @@ final class Database {
             $db = $cfg['database'] ?? '';
             $sslmode = $cfg['sslmode'] ?? 'require';
             if (!in_array($sslmode, ['require', 'verify-ca', 'verify-full'], true)) {
-                throw new \\InvalidArgumentException('Unsupported PostgreSQL TLS mode.');
+                throw new \InvalidArgumentException('Unsupported PostgreSQL TLS mode.');
             }
             $dsn = "pgsql:host={$host};port={$port};dbname={$db};sslmode={$sslmode}";
             self::$pdo = new PDO($dsn, $cfg['username'] ?? '', $cfg['password'] ?? '', [
