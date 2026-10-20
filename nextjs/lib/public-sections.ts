@@ -45,3 +45,12 @@ export async function listCommunityReplies(topicId:string):Promise<CommunityRepl
  const result=await conn.query<CommunityReply>(`SELECT id,content,created_at FROM community_replies WHERE topic_id=$1 AND status='published' ORDER BY created_at ASC LIMIT 200`,[topicId]);
  return result.rows;
 }
+
+export async function findPodcastEpisode(locale:string,slug:string):Promise<PodcastEpisode|null>{
+ if(!locales.has(locale)||slug.length>500)return null;const conn=db();if(!conn)return null;
+ const decoded=(()=>{try{return decodeURIComponent(slug)}catch{return slug}})();
+ const result=await conn.query<PodcastEpisode>(`SELECT e.id,COALESCE(t.title,e.title) title,COALESCE(t.slug,e.slug) slug,COALESCE(t.excerpt,e.excerpt) excerpt,e.cover_image,e.audio_url,e.duration,e.published_at
+ FROM podcast_episodes e LEFT JOIN podcast_episode_translations t ON t.episode_id=e.id AND t.locale=$1 AND t.status='published'
+ WHERE e.status='published' AND ($1='ar' OR t.id IS NOT NULL) AND COALESCE(t.slug,e.slug)=ANY($2::text[]) LIMIT 1`,[locale,[...new Set([slug,decoded])]]);
+ return result.rows[0]??null;
+}
