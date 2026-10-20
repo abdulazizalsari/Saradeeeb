@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS web_password_resets (id BIGSERIAL PRIMARY KEY, account_id BIGINT NOT NULL REFERENCES web_accounts(id) ON DELETE CASCADE, token_hash TEXT NOT NULL UNIQUE, expires_at TIMESTAMPTZ NOT NULL, used_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS idx_web_password_resets_account ON web_password_resets(account_id,expires_at DESC);
