@@ -4,7 +4,7 @@ import {listCategories} from "../lib/categories";
 export const dynamic="force-dynamic";
 export default async function sitemap():Promise<MetadataRoute.Sitemap>{
  const origin=(process.env.NEXT_PUBLIC_SITE_URL??"https://saradeeeb-preview.vercel.app").replace(/\/$/,"");
- const items:MetadataRoute.Sitemap=[{url:origin+"/",changeFrequency:"daily",priority:1}];
+ const items:MetadataRoute.Sitemap=[{url:origin+"/",changeFrequency:"daily",priority:1},{url:origin+"/ar/privacy-policy",changeFrequency:"yearly",priority:.3}];
  for(const locale of ["ar","en","es","fr","ru"]){
   items.push({url:origin+"/"+locale,changeFrequency:"daily",priority:.8});
   try{const categories=await listCategories(locale);if(categories.length){items.push({url:origin+"/"+locale+"/categories",changeFrequency:"weekly",priority:.6});for(const c of categories){items.push({url:origin+"/"+locale+"/category/"+encodeURIComponent(c.slug),changeFrequency:"weekly",priority:.6});}}}catch(e){console.error("sitemap categories error",locale,e);}
