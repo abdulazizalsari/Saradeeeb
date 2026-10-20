@@ -14,7 +14,7 @@
 | `/robots.txt` | `/robots.txt` | Public indexing allowed |
 | `/llms.txt` | `/llms.txt` | Basic informational text |
 | `/admin` | `/admin` | Guarded configurable PHP admin redirect; no admin runtime |
-| `/category/{slug}` | Not implemented | Pending |
+| `/{locale}/category/{slug}` | `/[locale]/category/[slug]` | Implemented with original category translations and linked articles; visual parity pending |
 | `/author/{slug}` | Not implemented | Pending |
 | `/writers` | Not implemented | Pending |
 | `/books`, `/book/{slug}` | Not implemented | Pending |
