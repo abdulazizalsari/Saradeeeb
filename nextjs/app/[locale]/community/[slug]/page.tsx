@@ -1,3 +1,4 @@
+import CommunityComposer from "../CommunityComposer";
 import Link from "next/link";
 import {notFound} from "next/navigation";
 import type {Metadata} from "next";
@@ -12,5 +13,6 @@ export default async function TopicPage({params}:Props){
  <Link href={`/${locale}/community`}>{arabic?"← العودة إلى المنتدى":"← Back to community"}</Link>
  <article><h1>{topic.title}</h1><p>{topic.excerpt}</p><div className="article-body" style={{whiteSpace:"pre-wrap"}}>{topic.content}</div></article>
  <section aria-labelledby="replies-heading"><h2 id="replies-heading">{arabic?"الردود":"Replies"} ({replies.length})</h2>{replies.map(reply=><article className="home-section" key={reply.id}><p style={{whiteSpace:"pre-wrap"}}>{reply.content}</p><small>{new Date(reply.created_at).toLocaleDateString(locale)}</small></article>)}{replies.length===0&&<p>{arabic?"لا توجد ردود منشورة بعد.":"No published replies yet."}</p>}</section>
+ <CommunityComposer locale={locale} topicId={topic.id}/>
  </main>;
 }
