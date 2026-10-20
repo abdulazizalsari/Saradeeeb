@@ -30,3 +30,5 @@
 - Added three original-schema-compatible tables: `tags`, `article_tags`, and `redirects` (all currently empty until original records are supplied).
 - The idempotent migration is versioned at `nextjs/migrations/20261020_tags_redirects.sql` and was applied directly to Neon.
 - **77 original tables remain unported**, assuming one-to-one table mapping. No claims of restored tag or redirect rows.
+
+- Continued migration: added `settings`, `translation_strings`, `newsletter_subscribers` and their indexes, using `nextjs/migrations/20261020_settings_translations_newsletter.sql`. Verified **15 Neon tables** in total; **74 original tables still not ported** by table-count comparison. No source newsletter subscriber records were imported.
