@@ -163,3 +163,9 @@
 - إضافة صفحتي `/account/forgot-password` و`/account/reset-password` وربط صفحة الحساب بطلب الاستعادة.
 - **الإرسال غير مفعل دون** `PASSWORD_RESET_WEBHOOK_URL` و`PASSWORD_RESET_WEBHOOK_SECRET` و`DATABASE_URL` على Vercel؛ يجب ربط خدمة بريد موثوقة تستقبل JSON `{to,resetUrl,subject}` بمصادقة Bearer، وضبط السماح بالاتصال بها. لم يُختبر إرسال بريد فعلي.
 - ما زال استيراد حسابات PHP الأصلية غير مكتمل. لا يوجد نشر مؤكد لهذه الدفعة.
+
+## فحص إعدادات استعادة الحساب — 2026-10-20
+- تم التحقق من إعدادات مشروع Vercel `saradeeeb-preview` دون قراءة قيم الأسرار. المتغيرات الموجودة: `DATABASE_URL` و`AUTH_SECRET` و`BLOB_READ_WRITE_TOKEN`.
+- متغيرا `PASSWORD_RESET_WEBHOOK_URL` و`PASSWORD_RESET_WEBHOOK_SECRET` **غير موجودين**؛ لذلك لا يمكن إرسال رسائل استعادة كلمة المرور فعليًا، ولا ينبغي تفعيل مسار إرسال دون موفر بريد موثوق.
+- إضافة `nextjs/app/account/reset-password/layout.tsx` مع `robots: noindex,nofollow` و`referrer: no-referrer` لتقليل تسرب رموز الاستعادة.
+- الاستعادة القديمة لحسابات PHP غير مثبتة بعد؛ لا يمكن نقل كلمات مرورها دون التحقق من المصدر والخوارزمية. النشر النهائي لم يتم التحقق منه.
