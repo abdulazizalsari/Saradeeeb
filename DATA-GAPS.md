@@ -23,3 +23,10 @@
 - 1 cover uses the new local `/images/jinn-desert.svg`.
 - 0 article rows have an empty image path, **but URL existence has not been checked**. Do not mistake populated URLs for available images.
 - Preserve original paths until media bytes are copied and validated; no blind URL rewrites.
+
+## Phase 1 continuation — PostgreSQL schema (2026-10-20)
+- Audited the original PHP `database/schema.sql`: **89** `CREATE TABLE` declarations.
+- Verified **12** base tables currently exist in production Neon (previously 9).
+- Added three original-schema-compatible tables: `tags`, `article_tags`, and `redirects` (all currently empty until original records are supplied).
+- The idempotent migration is versioned at `nextjs/migrations/20261020_tags_redirects.sql` and was applied directly to Neon.
+- **77 original tables remain unported**, assuming one-to-one table mapping. No claims of restored tag or redirect rows.
