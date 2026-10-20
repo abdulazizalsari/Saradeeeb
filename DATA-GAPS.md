@@ -16,3 +16,10 @@
 - Original authors, user identities, comments, pages, books, podcasts, community, settings and admin data require private migration and compatibility work.
 - Original image URLs are referenced but actual image availability and complete media transfer have not been validated.
 - Legacy route parity and browser functional tests are outstanding.
+
+## Media inventory — verified in Neon
+- 19 article cover images reference legacy `https://saradeeeb.com/wp-content/` URLs.
+- 1 article cover references original `/uploads/` storage.
+- 1 cover uses the new local `/images/jinn-desert.svg`.
+- 0 article rows have an empty image path, **but URL existence has not been checked**. Do not mistake populated URLs for available images.
+- Preserve original paths until media bytes are copied and validated; no blind URL rewrites.
