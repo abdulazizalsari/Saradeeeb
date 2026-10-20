@@ -1,15 +1,19 @@
 # Data gaps — verified 2026-10-20
 
-## Production Neon counts
-- Articles: **21**; article translations: **19**; users: **1**.
-- **13** translations have empty content and **13** use temporary slugs matching `archive-%`.
-- The current 1-user placeholder archive account is not a migration of original account identities.
+## Production Neon after public-content restoration
+- Articles: **21** (20 from original archive + 1 newly authored).
+- Article translations: **19** (18 from original archive + 1 newly authored).
+- Empty article translations: **0**.
+- Temporary `archive-%` slugs: **0**.
+- Minimum original translated article content length: **1603 characters**.
+- Users: **1 placeholder archival author**; original user accounts have **not** been imported.
 
-## Original source
-- A local SQL restore file was previously prepared from the uploaded backup, but the complete original records have **not** been applied to Neon. Original source data includes more than article titles and must be migrated without exposing personal records.
-- Original MySQL schema contains approximately 89 tables; Neon has not been proven equivalent.
-- Original image URLs and actual asset existence are not comprehensively audited.
+## What was imported
+The previously generated private-data-free `saradeeeb_restore_public_content.sql` was applied to production Neon using idempotent UPSERT statements in six transactions. It restores the original 18 translated article bodies and source slugs, along with 20 article records. No password hashes, emails, 2FA secrets, or other private user data were included.
 
-## Next action
-- Restore full original translations and canonical slugs through a private idempotent migration, using explicit checks and no blind deletion. Run `node nextjs/scripts/audit-data.mjs` with `DATABASE_URL` to identify gaps.
-- Do not publish an unverified '100% restored' claim.
+## Outstanding
+- Original schema contains approximately 89 MySQL tables; PostgreSQL parity is not complete.
+- Original category, page, author, settings, comments, writer and community records are not fully migrated.
+- Original article image URLs were restored as references, but actual image availability and complete media migration remain unverified.
+- Original user identities and authentication compatibility are not migrated.
+- One original article record may lack a translation; reconcile source-to-target relationships.
