@@ -2,19 +2,16 @@
 
 **Status: PARTIAL / NOT ACCEPTED.**
 
-## Completed
-- Imported original **20 article records and 18 full article translations** into production Neon via six idempotent SQL transactions.
-- Preserved source slugs, original article text and source image references.
-- Retained the separately authored article `جن الصحراء`.
-- Confirmed **21 articles, 19 translations, 0 empty translations, 0 temporary archive slugs** in production Neon.
-- Added read-only `nextjs/scripts/audit-data.mjs`.
+## Verified completed
+- Original 20 articles and 18 full translations imported to Neon with canonical slugs.
+- 10 original categories, 14 translations and original article-category links restored.
+- Added data audit script and implemented category read queries.
+- Neon verification: **21 articles, 19 translations, 0 empty, 0 temporary slugs; 10 categories, 14 category translations, 22 article-category links**.
 
 ## Outstanding
-- Complete MySQL-to-PostgreSQL schema conversion for ~89 tables.
-- Original accounts, comments, categories, pages, settings and community data.
-- Real image uploads and HTTP verification, source-to-target reconciliation for all tables.
-- Do not expose or commit private user backup data.
+- 89-table PostgreSQL schema parity, original accounts, authors, pages, settings, comments, community and admin data.
+- Transfer/HTTP verification of all original media; article images currently use restored source references.
+- Complete source-vs-target reconciliation and authenticated workflows.
 
 ## Tests
-- Direct Neon production aggregate query **passed** for nonempty article translations and absence of temporary slugs.
-- Image checks, full source-to-target table reconciliation and functional acceptance **not run**.
+Neon aggregate queries passed; end-to-end media and user workflow checks not run.
