@@ -1,19 +1,18 @@
 # Data gaps — verified 2026-10-20
 
-## Production Neon after public-content restoration
-- Articles: **21** (20 from original archive + 1 newly authored).
-- Article translations: **19** (18 from original archive + 1 newly authored).
-- Empty article translations: **0**.
-- Temporary `archive-%` slugs: **0**.
-- Minimum original translated article content length: **1603 characters**.
-- Users: **1 placeholder archival author**; original user accounts have **not** been imported.
+## Production Neon after restoration
+- **21 articles** (20 original, 1 new); **19 article translations** (18 original, 1 new).
+- **0 empty article translations**; **0 temporary `archive-%` slugs**.
+- **10 original categories**, **14 category translations**, **22 article-category links** (includes preexisting links).
+- **1 placeholder archive author**; original accounts and password hashes have **not** been migrated.
 
-## What was imported
-The previously generated private-data-free `saradeeeb_restore_public_content.sql` was applied to production Neon using idempotent UPSERT statements in six transactions. It restores the original 18 translated article bodies and source slugs, along with 20 article records. No password hashes, emails, 2FA secrets, or other private user data were included.
+## Completed
+- Applied sanitized original public-content SQL through six idempotent Neon transactions, preserving original article bodies and slugs.
+- Restored category names, locale translations and original article-category relationships from the October 13 source backup.
+- Implemented category pages and connected real category navigation on homepage.
 
-## Outstanding
-- Original schema contains approximately 89 MySQL tables; PostgreSQL parity is not complete.
-- Original category, page, author, settings, comments, writer and community records are not fully migrated.
-- Original article image URLs were restored as references, but actual image availability and complete media migration remain unverified.
-- Original user identities and authentication compatibility are not migrated.
-- One original article record may lack a translation; reconcile source-to-target relationships.
+## Remaining
+- The original MySQL schema contains approximately 89 tables, versus nine currently present in Neon.
+- Original authors, user identities, comments, pages, books, podcasts, community, settings and admin data require private migration and compatibility work.
+- Original image URLs are referenced but actual image availability and complete media transfer have not been validated.
+- Legacy route parity and browser functional tests are outstanding.
