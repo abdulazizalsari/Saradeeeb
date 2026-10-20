@@ -24,3 +24,15 @@ WHERE t.locale=$1 AND t.status='published' AND a.status='published'
 ORDER BY a.published_at DESC LIMIT $2`,[locale,Math.min(50,Math.max(1,limit))]);
 return result.rows;
 }
+
+export async function searchPublishedArticles(locale:string,term:string,limit=60):Promise<Article[]>{
+ if(!locales.has(locale)||!term.trim())return [];
+ const conn=connection();if(!conn)return [];
+ const needle="%"+term.trim().slice(0,120).replace(/[\\%_]/g,m=>"\\"+m)+"%";
+ const result=await conn.query<Article>(`SELECT t.title,t.slug,t.excerpt,t.content,a.featured_image,a.published_at,u.username AS author_name
+ FROM article_translations t JOIN articles a ON a.id=t.article_id JOIN users u ON u.id=a.author_id
+ WHERE t.locale=$1 AND t.status='published' AND a.status='published'
+ AND (t.title ILIKE $2 ESCAPE '\\' OR t.excerpt ILIKE $2 ESCAPE '\\' OR t.content ILIKE $2 ESCAPE '\\')
+ ORDER BY a.published_at DESC LIMIT $3`,[locale,needle,Math.min(200,Math.max(1,limit))]);
+ return result.rows;
+}
