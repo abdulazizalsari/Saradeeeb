@@ -27,3 +27,5 @@
 All missing routes require source-view matching and HTTP tests before acceptance.
 
 | `/{legacy-article-slug}/` | `/[locale]` fallback → `/ar/article/{canonical-slug}` | Permanent redirect for matching published Arabic articles; other legacy routes pending |
+
+| `/{locale}/categories` | `/[locale]/categories` | Implemented category directory from Neon |
