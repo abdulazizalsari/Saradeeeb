@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {notFound} from "next/navigation";
+import type {Metadata} from "next";
 import {categoryWithArticles} from "../../../../lib/categories";
 export const dynamic="force-dynamic";
 const locales=new Set(["ar","en","es","fr","ru"]);
+export async function generateMetadata({params}:{params:Promise<{locale:string;slug:string}>}):Promise<Metadata>{const {locale,slug}=await params;const data=await categoryWithArticles(locale,slug);return {title:data?data.category.name+" | سراديب":"تصنيف غير موجود | سراديب",description:data?.category.description??undefined};}
 export default async function CategoryPage({params}:{params:Promise<{locale:string;slug:string}>}){
  const {locale,slug}=await params;if(!locales.has(locale))notFound();
  const data=await categoryWithArticles(locale,slug);if(!data)notFound();
