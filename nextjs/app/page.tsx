@@ -8,7 +8,7 @@ const sectionItems=[
   {path:"community",name:"منتدى سراديب",summary:"نقاشات واهتمامات ومساحات للمشاركة.",icon:"community"},
   {path:"search",name:"المقالات",summary:"قصص ومعرفة وتحليلات وملفات مختارة.",icon:"book"}
 ];
-function articleUrl(slug:string){return "/article/"+encodeURIComponent(slug);}
+function articleUrl(slug:string){return "/ar/article/"+encodeURIComponent(slug);}
 function readingTime(content:string){return Math.max(1,Math.ceil(content.replace(/<[^>]*>/g," ").trim().split(/\s+/).length/220));}
 export default async function HomePage(){
  const [articles,categories]=await Promise.all([listPublishedArticles("ar",24),listCategories("ar")]);
