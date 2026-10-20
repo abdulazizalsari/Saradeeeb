@@ -54,3 +54,12 @@ export async function findPodcastEpisode(locale:string,slug:string):Promise<Podc
  WHERE e.status='published' AND ($1='ar' OR t.id IS NOT NULL) AND COALESCE(t.slug,e.slug)=ANY($2::text[]) LIMIT 1`,[locale,[...new Set([slug,decoded])]]);
  return result.rows[0]??null;
 }
+
+export async function findKhatera(locale:string,slug:string):Promise<Khatera|null>{
+ if(!locales.has(locale)||slug.length>500)return null;const conn=db();if(!conn)return null;
+ const decoded=(()=>{try{return decodeURIComponent(slug)}catch{return slug}})();
+ const result=await conn.query<Khatera>(`SELECT k.id,COALESCE(t.body,k.body) body,COALESCE(t.slug,k.slug) slug,k.image_path,k.published_at
+ FROM khawatir k LEFT JOIN khawatir_translations t ON t.khawatir_id=k.id AND t.locale=$1 AND t.status='published'
+ WHERE k.status='published' AND ($1='ar' OR t.id IS NOT NULL) AND COALESCE(t.slug,k.slug)=ANY($2::text[]) LIMIT 1`,[locale,[...new Set([slug,decoded])]]);
+ return result.rows[0]??null;
+}
