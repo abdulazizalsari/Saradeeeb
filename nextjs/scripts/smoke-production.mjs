@@ -1,5 +1,5 @@
 const base=(process.env.SITE_URL||"https://saradeeeb-preview.vercel.app").replace(/\/$/,"");
-const paths=["/","/ar","/ar/categories","/ar/search?q=%D9%87%D8%B3%D8%AF%D8%A7%D9%84%D9%86","/sitemap.xml","/robots.txt","/feed.xml","/llms.txt","/llms-full.txt"];
+const paths=["/","/ar","/ar/categories","/ar/privacy-policy","/ar/search?q=%D9%87%D8%B3%D8%AF%D8%A7%D9%84%D9%86","/sitemap.xml","/robots.txt","/feed.xml","/llms.txt","/llms-full.txt"];
 let failed=0;
 for(const path of paths){
  try{
