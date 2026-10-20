@@ -12,6 +12,6 @@ export async function POST(req:NextRequest){
   if(!result.rows[0]||!verifyPassword(current,result.rows[0].password_hash))return NextResponse.json({error:"Current password is incorrect"},{status:403});
   const updated=await db.query("UPDATE web_accounts SET password_hash=$1 WHERE id=$2 AND password_hash=$3",[hashPassword(next),id,result.rows[0].password_hash]);
   if(updated.rowCount!==1)return NextResponse.json({error:"Please retry password change"},{status:409});
-  return NextResponse.json({ok:true},{headers:{"Cache-Control":"no-store"}});
+  const response=NextResponse.json({ok:true,reauthenticationRequired:true},{headers:{"Cache-Control":"no-store"}});response.cookies.set("saradeeeb_web_session","",{httpOnly:true,secure:process.env.NODE_ENV==="production",sameSite:"lax",path:"/",maxAge:0});return response;
  }catch{return NextResponse.json({error:"Password change unavailable"},{status:503});}
 }
