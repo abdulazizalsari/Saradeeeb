@@ -20,7 +20,8 @@
 | `/books`, `/book/{slug}` | Not implemented | Pending |
 | `/podcast`, `/podcast/{slug}` | Not verified | Pending |
 | `/khawatir` | Not verified | Pending |
-| `/contact`, `/about`, `/privacy-policy` | Not verified | Pending |
+| `/contact`, `/about` | Not verified | Pending |
+| `/{locale}/privacy-policy` | `/[locale]/privacy-policy` | Original Arabic view and CSS classes ported; other locales pending |
 | `/send-story`, `/story-status` | Not verified | Pending |
 | `/ad/click/{id}` | Not implemented | Pending |
 
