@@ -8,7 +8,9 @@ try{
  (SELECT count(*) FROM article_translations) AS translations,
  (SELECT count(*) FROM article_translations WHERE content IS NULL OR btrim(content)='') AS empty_translations,
  (SELECT count(*) FROM article_translations WHERE slug LIKE 'archive-%') AS temporary_slugs,
- (SELECT count(*) FROM articles WHERE featured_image IS NULL OR btrim(featured_image)='') AS missing_image_paths`);
+ (SELECT count(*) FROM articles WHERE featured_image IS NULL OR btrim(featured_image)='') AS missing_image_paths,
+ (SELECT count(*) FROM articles WHERE featured_image LIKE 'https://saradeeeb.com/wp-content/%') AS legacy_wp_images,
+ (SELECT count(*) FROM articles WHERE featured_image LIKE '/uploads/%') AS original_upload_paths`);
  console.log(JSON.stringify(q.rows[0],null,2));
  const gaps=await db.query(`SELECT a.id,t.locale,t.slug,CASE WHEN t.id IS NULL THEN 'missing_translation' WHEN t.content IS NULL OR btrim(t.content)='' THEN 'empty_content' WHEN t.slug LIKE 'archive-%' THEN 'temporary_slug' END AS issue
  FROM articles a LEFT JOIN article_translations t ON t.article_id=a.id
