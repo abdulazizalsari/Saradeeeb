@@ -7,7 +7,7 @@ const locales=new Set(["ar","en","es","fr","ru"]);
 export async function generateMetadata({params}:{params:Promise<{locale:string;slug:string}>}):Promise<Metadata>{const {locale,slug}=await params;const data=await categoryWithArticles(locale,slug);return {title:data?data.category.name+" | سراديب":"تصنيف غير موجود | سراديب",description:data?.category.description??undefined,alternates:data?{canonical:"/"+locale+"/category/"+encodeURIComponent(data.category.slug)}:{}};}
 export default async function CategoryPage({params,searchParams}:{params:Promise<{locale:string;slug:string}>;searchParams:Promise<{page?:string}>}){
  const {locale,slug}=await params;if(!locales.has(locale))notFound();
- const {page:pageParam}=await searchParams;const page=typeof pageParam==="string"&&/^[1-9]\\d{0,3}$/.test(pageParam)?Number(pageParam):1;
+ const {page:pageParam}=await searchParams;const page=typeof pageParam==="string"&&/^[1-9]\d{0,3}$/.test(pageParam)?Number(pageParam):1;
  const data=await categoryWithArticles(locale,slug,page);if(!data)notFound();if(data.pages>0&&page>data.pages)notFound();
  return <main className="container article-migration" dir={locale==="ar"?"rtl":"ltr"} lang={locale}>
  <Link href={`/${locale}/categories`}>← جميع التصنيفات</Link>
