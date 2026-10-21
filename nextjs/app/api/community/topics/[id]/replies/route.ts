@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from "next/server";
-import {database,verifySession} from "../../../../../lib/auth";
+import {database,verifySession} from "../../../../../../lib/auth";
 export const runtime="nodejs";
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){
  const origin=req.headers.get("origin");
