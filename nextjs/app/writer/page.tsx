@@ -1,12 +1,13 @@
 import {cookies} from "next/headers";
 import {redirect} from "next/navigation";
 import Link from "next/link";
+import WriterEditor from "./editor";
 import {database,verifySession} from "../../lib/auth";
 
 export const dynamic="force-dynamic";
 export const metadata={title:"لوحة الكاتب | سراديب",robots:{index:false,follow:false}};
 type Writer={id:string;username:string;role:string};
-type Draft={id:string;title:string;status:string;updated_at:Date};
+type Draft={id:string;title:string;body:string;status:string;updated_at:string};
 
 export default async function WriterDashboard(){
  const store=await cookies();
@@ -21,7 +22,7 @@ export default async function WriterDashboard(){
   if(!["writer","trusted_writer","editor","admin"].includes(writer.role))
    return <main dir="rtl" className="container"><h1>قسم الكاتب</h1><p>حسابك مسجل، لكن صلاحية الكاتب لم تُفعّل بعد. تواصل مع الإدارة لطلب التفعيل.</p><Link href="/account">حسابي</Link></main>;
   const resultDrafts=await database().query<Draft>(
-   "SELECT id,title,status,updated_at FROM writer_drafts WHERE writer_account_id=$1 ORDER BY updated_at DESC LIMIT 100",[id]);
+   "SELECT id,title,body,status,updated_at FROM writer_drafts WHERE writer_account_id=$1 ORDER BY updated_at DESC LIMIT 100",[id]);
   drafts=resultDrafts.rows;
  }catch{
   return <main dir="rtl" className="container"><h1>قسم الكاتب</h1><p>القسم غير متاح مؤقتًا. تحقق من تطبيق ترحيل قاعدة البيانات واتصالها.</p></main>;
@@ -29,10 +30,7 @@ export default async function WriterDashboard(){
  return <main dir="rtl" className="container" style={{paddingBlock:40}}>
   <h1>لوحة الكاتب</h1><p>مرحبًا {writer?.username}</p>
   <p>المسودات: {drafts.filter(d=>d.status==="draft").length} · قيد المراجعة: {drafts.filter(d=>d.status==="submitted").length}</p>
-  <h2>أعمالي</h2>
-  {drafts.length===0?<p>ليس لديك أعمال محفوظة بعد.</p>:
-   <ul>{drafts.map(d=><li key={d.id}>{d.title} — {d.status}</li>)}</ul>}
-  <p>إنشاء المقالات وإرسالها للمراجعة سيكونان ضمن المرحلة التالية؛ لا تُمنح صلاحية النشر تلقائيًا.</p>
+  <WriterEditor initial={drafts.map(d=>({...d,updated_at:String(d.updated_at)}))}/>
   <Link href="/account">إدارة حسابي</Link>
  </main>;
 }
