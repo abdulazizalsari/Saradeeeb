@@ -7,7 +7,7 @@ export async function GET(req:NextRequest){
  if(!process.env.DATABASE_URL)return NextResponse.json([]);
  const pool=new Pool({connectionString:process.env.DATABASE_URL,ssl:process.env.DATABASE_SSL_INSECURE==="true"?{rejectUnauthorized:false}:{rejectUnauthorized:true},max:1,connectionTimeoutMillis:5000});
  try{
-  const result=await pool.query<{name:string;slug:string;count:string}>(`SELECT t.name,t.slug,COUNT(DISTINCT a.id)::text AS count
+  const result=await pool.query<{name:string;slug:string;count:string}>(`SELECT t.name,t.slug,COUNT(DISTINCT CASE WHEN at.article_id IS NOT NULL THEN a.id END)::text AS count
  FROM categories c JOIN category_translations t ON t.category_id=c.id
  LEFT JOIN article_categories ac ON ac.category_id=c.id
  LEFT JOIN articles a ON a.id=ac.article_id AND a.status='published'
