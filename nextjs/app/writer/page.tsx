@@ -17,7 +17,7 @@ export default async function WriterDashboard(){
  try{
   const result=await database().query<Writer>("SELECT id,username,role FROM web_accounts WHERE id=$1",[id]);
   writer=result.rows[0];
-  if(!writer)redirect("/account");
+  if(!writer)throw new Error("Account missing");
   if(!["writer","trusted_writer","editor","admin"].includes(writer.role))
    return <main dir="rtl" className="container"><h1>قسم الكاتب</h1><p>حسابك مسجل، لكن صلاحية الكاتب لم تُفعّل بعد. تواصل مع الإدارة لطلب التفعيل.</p><Link href="/account">حسابي</Link></main>;
   const resultDrafts=await database().query<Draft>(
@@ -27,7 +27,7 @@ export default async function WriterDashboard(){
   return <main dir="rtl" className="container"><h1>قسم الكاتب</h1><p>القسم غير متاح مؤقتًا. تحقق من تطبيق ترحيل قاعدة البيانات واتصالها.</p></main>;
  }
  return <main dir="rtl" className="container" style={{paddingBlock:40}}>
-  <h1>لوحة الكاتب</h1><p>مرحبًا {writer.username}</p>
+  <h1>لوحة الكاتب</h1><p>مرحبًا {writer?.username}</p>
   <p>المسودات: {drafts.filter(d=>d.status==="draft").length} · قيد المراجعة: {drafts.filter(d=>d.status==="submitted").length}</p>
   <h2>أعمالي</h2>
   {drafts.length===0?<p>ليس لديك أعمال محفوظة بعد.</p>:
