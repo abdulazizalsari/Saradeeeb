@@ -3,6 +3,7 @@ import SiteFooter from "./site-footer";
 import SiteHeader from "./site-header";
 import type { Metadata } from "next";
 import "./original-site.css";
+import "./classic-header.css";
 import "./globals.css";
 import "./article-migration.css";
 import "./account.css";
