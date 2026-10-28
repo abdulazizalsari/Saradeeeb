@@ -12,7 +12,7 @@ export default function SiteHeader(){
  const [dark,setDark]=useState(false);
  const nav=[
  {href:"/",ar:"الرئيسية",en:"Home"},
- {href:prefix+"/categories",ar:"أقسام سراديب",en:"Categories"},
+ 
  {href:prefix+"/podcast",ar:"بودكاست سراديب",en:"Podcast"},
  {href:prefix+"/khawatir",ar:"خواطر",en:"Reflections"},
  {href:prefix+"/community",ar:"منتدى سراديب",en:"Community"}
@@ -21,7 +21,7 @@ export default function SiteHeader(){
  <header className="site-header classic-header" data-dark={dark}>
  <div className="container header-inner">
  <Link href="/" className="brand" aria-label={arabic?"سراديب - الرئيسية":"Saradeeeb home"}><span className="brand-mark" aria-hidden="true">س</span><span><strong>سراديب</strong></span></Link>
- <nav className="main-nav" aria-label={arabic?"القائمة الرئيسية":"Main navigation"}>{nav.map(item=><Link key={item.href} href={item.href} aria-current={pathname===item.href?"page":undefined}>{arabic?item.ar:item.en}</Link>)}</nav>
+ <nav className="main-nav" aria-label={arabic?"القائمة الرئيسية":"Main navigation"}>{nav.slice(0,1).map(item=><Link key={item.href} href={item.href} aria-current={pathname===item.href?"page":undefined}>{arabic?item.ar:item.en}</Link>)}<details className="categories-dropdown"><summary>{arabic?"أقسام سراديب":"Categories"} <span aria-hidden="true">▦</span></summary><div className="categories-menu"><Link href={prefix+"/categories"}><span>{arabic?"كل المقالات":"All articles"}</span><small>0</small></Link><Link href={prefix+"/category/energy-drain"}><span>{arabic?"نزيف الطاقة":"Energy drain"}</span><small>0</small></Link></div></details>{nav.slice(1).map(item=><Link key={item.href} href={item.href} aria-current={pathname===item.href?"page":undefined}>{arabic?item.ar:item.en}</Link>)}</nav>
  <div className="header-actions">
  <Link className="header-link story-link" href={prefix+"/community"}>{arabic?"أرسل قصتك":"Share your story"}</Link>
  <Link className="header-link account-link" href="/account">{arabic?"حسابي":"My account"}</Link>
